@@ -9,10 +9,7 @@ export default function Navigation({ activeView, setActiveView }: NavigationProp
   return (
     <nav className="top-nav">
       <div className="logo-area">
-        <div className="logo-icon">
-          <div className="logo-ring"></div>
-          <span className="logo-sun">☀️</span>
-        </div>
+        <img src="/conecta-farma_logo-2.png" alt="Conecta Farma Logo" className="logo-icon" />
         <div className="logo-text">
           <span>CONECTA</span>FARMA
         </div>

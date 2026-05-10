@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function FarmaceuticoView() {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   return (
     <div className="view active">
       <div className="hero-strip" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1a3f72 100%)" }}>
@@ -16,7 +18,17 @@ export default function FarmaceuticoView() {
       </div>
 
       <div className="app-shell">
-        <div className="phone-frame">
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {!isFullscreen && (
+            <button 
+              className="btn btn-primary btn-sm" 
+              onClick={() => setIsFullscreen(true)}
+              style={{ alignSelf: "flex-start", zIndex: 10 }}
+            >
+              📱 Modo Mobile
+            </button>
+          )}
+          <div className={`phone-frame ${isFullscreen ? 'fullscreen' : ''}`}>
           <div className="phone-notch">
             <div className="phone-notch" style={{ margin: 0 }}>
               <div className="notch-speaker"></div>
@@ -31,6 +43,15 @@ export default function FarmaceuticoView() {
               <div className="screen-status">
                 <span>09:41</span>
                 <div className="status-icons">
+                  {isFullscreen && (
+                    <span 
+                      style={{ cursor: "pointer", marginRight: "8px", fontSize: "14px", color: "white" }} 
+                      onClick={() => setIsFullscreen(false)}
+                      title="Sair do Modo Mobile"
+                    >
+                      ↙️
+                    </span>
+                  )}
                   <span>📶</span>
                   <span>🔋</span>
                 </div>
@@ -240,6 +261,7 @@ export default function FarmaceuticoView() {
               </div>
             </div>
           </div>
+        </div>
         </div>
 
         {/* Side */}

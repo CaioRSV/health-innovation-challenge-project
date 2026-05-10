@@ -124,7 +124,7 @@ body {
 
 /* ── VIEWS ── */
 .view { display: none; animation: fadeIn 0.35s ease; }
-.view.active { display: flex; }
+.view.active { display: flex; flex-direction: row; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -151,6 +151,7 @@ body {
   padding: 32px;
   align-items: flex-start;
   flex-wrap: wrap;
+  flex: 1;
 }
 
 .phone-frame {
@@ -161,6 +162,21 @@ body {
   padding: 12px;
   box-shadow: 0 24px 64px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.phone-frame.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  min-width: 100vw;
+  z-index: 9999;
+  border-radius: 0;
+  padding: 0;
+  background: var(--gray-50);
+  box-shadow: none;
 }
 
 .phone-notch {
@@ -175,6 +191,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+}
+
+.phone-frame.fullscreen .phone-notch {
+  display: none;
 }
 
 .notch-cam {
@@ -198,6 +218,11 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+.phone-frame.fullscreen .phone-screen {
+  border-radius: 0;
+  height: 100vh;
 }
 
 .screen-header {
@@ -607,6 +632,9 @@ body {
   color: white;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+  width: 350px;
+  min-height: calc(100vh - 64px);
 }
 
 .hero-strip::before {
@@ -780,4 +808,88 @@ body {
   width: 12px; height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+/* ── RESPONSIVE DESIGN ── */
+@media (max-width: 992px) {
+  .view.active {
+    flex-direction: column;
+  }
+
+  .hero-strip {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .app-shell {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .side-panel {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-nav {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .logo-area {
+    margin-right: 0;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .user-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .app-shell {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .phone-frame {
+    width: 100%;
+    min-width: 0;
+    max-width: 400px;
+  }
+
+  .hero-strip {
+    padding: 24px 16px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-strip::before {
+    display: none;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-tab {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
 }

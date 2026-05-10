@@ -9,6 +9,7 @@ import PerfilTab from "./paciente/PerfilTab";
 
 export default function PacienteView() {
   const [activeTab, setActiveTab] = useState("inicio");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
     <div className="view active">
@@ -29,7 +30,17 @@ export default function PacienteView() {
 
       <div className="app-shell">
         {/* PHONE */}
-        <div className="phone-frame">
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {!isFullscreen && (
+            <button 
+              className="btn btn-primary btn-sm" 
+              onClick={() => setIsFullscreen(true)}
+              style={{ alignSelf: "flex-start", zIndex: 10 }}
+            >
+              📱 Modo Mobile
+            </button>
+          )}
+          <div className={`phone-frame ${isFullscreen ? 'fullscreen' : ''}`}>
           <div className="phone-notch">
             <div className="notch-speaker"></div>
             <div className="notch-cam"></div>
@@ -40,6 +51,15 @@ export default function PacienteView() {
               <div className="screen-status">
                 <span>09:41</span>
                 <div className="status-icons">
+                  {isFullscreen && (
+                    <span 
+                      style={{ cursor: "pointer", marginRight: "8px", fontSize: "14px", color: "white" }} 
+                      onClick={() => setIsFullscreen(false)}
+                      title="Sair do Modo Mobile"
+                    >
+                      ↙️
+                    </span>
+                  )}
                   <span>📶</span>
                   <span>🔋</span>
                 </div>
@@ -88,6 +108,7 @@ export default function PacienteView() {
               </div>
             </div>
           </div>
+        </div>
         </div>
 
         {/* SIDE PANEL */}
