@@ -119,6 +119,12 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
     (pMed) => !meds.some((m) => m.id === pMed.id)
   );
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       
@@ -134,11 +140,12 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
               style={{ 
                 width: "80px", height: "80px", borderRadius: "50%", 
                 background: "var(--blue-pale)", display: "flex", alignItems: "center", 
-                justifyContent: "center", fontSize: "40px", cursor: "pointer",
-                border: "3px solid var(--blue-light)", position: "relative"
+                justifyContent: "center", fontSize: editingAvatar ? "40px" : "28px", cursor: "pointer",
+                border: "3px solid var(--blue-light)", position: "relative",
+                color: "var(--blue-dark)", fontWeight: 800
               }}
             >
-              {editingAvatar}
+              {editingAvatar || getInitials(editingName || "User")}
               <div style={{
                 position: "absolute", bottom: "-4px", right: "-4px", 
                 background: "white", borderRadius: "50%", width: "28px", height: "28px",
@@ -157,6 +164,18 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
                 display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "8px",
                 width: "220px"
               }}>
+                {/* Opção para usar iniciais */}
+                <div 
+                  onClick={() => { setEditingAvatar(""); setShowAvatarSelect(false); }}
+                  style={{ 
+                    fontSize: "14px", cursor: "pointer", padding: "4px",
+                    background: editingAvatar === "" ? "var(--blue-pale)" : "var(--gray-100)",
+                    borderRadius: "8px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "var(--blue-dark)"
+                  }}
+                  title="Usar Iniciais"
+                >
+                  {getInitials(editingName || "User")}
+                </div>
                 {availableAvatars.map(av => (
                   <div 
                     key={av} 

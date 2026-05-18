@@ -18,7 +18,7 @@ export default function PacienteView() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Shared state
-  const [profile, setProfile] = useState<UserProfile>({ name: "Maria Silva", avatar: "👩🏽‍🦱" });
+  const [profile, setProfile] = useState<UserProfile>({ name: "Maria Silva", avatar: "" });
   const [meds, setMeds] = useState<Medicine[]>(initialMeds);
   const [medsDone, setMedsDone] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -28,11 +28,22 @@ export default function PacienteView() {
     return initial;
   });
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
   return (
     <div className="view active">
       <div className="hero-strip">
-        <div className="hero-title">
-          Olá, <span>{profile.name}</span> {profile.avatar}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+          <div className="avatar" style={{ background: "rgba(255,255,255,0.2)", color: "white", width: "48px", height: "48px", fontSize: profile.avatar ? "28px" : "18px" }}>
+            {profile.avatar || getInitials(profile.name)}
+          </div>
+          <div className="hero-title" style={{ margin: 0 }}>
+            Olá, <span>{profile.name}</span>
+          </div>
         </div>
         <div className="hero-sub">
           Bem-vinda ao Conecta Farma. Aqui você não está sozinha no seu tratamento — acompanhamos você

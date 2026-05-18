@@ -61,3 +61,8 @@
 {"timestamp":"20:16:38.277","source":"Browser","level":"ERROR","message":"\u001b[31mUncaught ReferenceError: setSelectedDate is not defined\u001b[39m\n\u001b[31m    at onClick (src/components/paciente/InicioTab.tsx:252:19)\n    at button (<anonymous>)\n    at InicioTab (src/components/paciente/InicioTab.tsx:246:13)\n    at PacienteView (src/components/PacienteView.tsx:42:37)\n    at Home (src/components/GestorView.tsx:570:105)\u001b[39m\n  \u001b[90m250 |\u001b[0m                 \u001b[36mif\u001b[0m (confirm(\u001b[32m\"Deseja cancelar este agendamento?\"\u001b[0m)) {\n  \u001b[90m251 |\u001b[0m                   setScheduledTeleconsulta(\u001b[36mnull\u001b[0m);\n\u001b[31m\u001b[1m>\u001b[0m \u001b[90m252 |\u001b[0m                   setSelectedDate(\u001b[32m\"\"\u001b[0m);\n  \u001b[90m    |\u001b[0m                   \u001b[31m\u001b[1m^\u001b[0m\n  \u001b[90m253 |\u001b[0m                 }\n  \u001b[90m254 |\u001b[0m               }}\n  \u001b[90m255 |\u001b[0m             >"}
 {"timestamp":"20:18:01.364","source":"Server","level":"LOG","message":"✓ Compiled in 30ms"}
 {"timestamp":"20:25:49.650","source":"Server","level":"LOG","message":"✓ Compiled in 40ms"}
+{"timestamp":"20:31:03.033","source":"Server","level":"LOG","message":"✓ Compiled in 44ms"}
+{"timestamp":"20:38:22.023","source":"Server","level":"LOG","message":"✓ Compiled in 45ms"}
+{"timestamp":"20:41:08.299","source":"Server","level":"LOG","message":"✓ Compiled in 52ms"}
+{"timestamp":"20:41:20.941","source":"Server","level":"LOG","message":"✓ Compiled in 29ms"}
+{"timestamp":"20:41:40.823","source":"Server","level":"LOG","message":"✓ Compiled in 12ms"}

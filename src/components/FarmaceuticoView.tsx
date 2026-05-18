@@ -2,6 +2,183 @@ import React, { useState } from "react";
 
 export default function FarmaceuticoView() {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [activeTab, setActiveTab] = useState("inicio");
+
+  // Mocks based on PacienteView data
+  const mariaMeds = [
+    { name: "Sinvastatina", dose: "20mg · Oral", freq: "Uso Diário" },
+    { name: "AAS Protect", dose: "100mg · Oral", freq: "Uso Diário" }
+  ];
+
+  const renderInicio = () => (
+    <>
+      {/* KPIs */}
+      <div className="stats-row">
+        <div className="stat-box">
+          <div className="stat-num" style={{ color: "var(--green)" }}>82%</div>
+          <div className="stat-label">Adesão média</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-num" style={{ color: "var(--red)" }}>5</div>
+          <div className="stat-label">Em risco</div>
+        </div>
+      </div>
+
+      {/* Alertas Rápidos */}
+      <div className="card" style={{ border: "1px solid #fca5a5" }}>
+        <div className="card-title">🚨 Alertas Recentes</div>
+        <div className="alert-patient yellow">
+          <div>
+            <div className="ap-name">Maria Silva, 51a</div>
+            <div className="ap-reason">Relato de Náusea via IA Tira-Dúvidas</div>
+          </div>
+          <div style={{ marginLeft: "auto" }}><div className="badge badge-yellow">Atenção</div></div>
+        </div>
+        <div className="alert-patient red">
+          <div>
+            <div className="ap-name">Carlos M., 58a</div>
+            <div className="ap-reason">Não retirou CEAF há 45 dias</div>
+          </div>
+          <div style={{ marginLeft: "auto" }}><div className="badge badge-red">Crítico</div></div>
+        </div>
+      </div>
+
+      {/* Agenda Resumo */}
+      <div className="card">
+        <div className="card-title">📅 Próximos Atendimentos</div>
+        <div className="timeline-item">
+          <div className="timeline-dot" style={{ background: "var(--blue-pale)" }}>🎥</div>
+          <div className="timeline-content">
+            <div className="timeline-title">Teleconsulta — Maria Silva</div>
+            <div className="timeline-time">Hoje · 14h00</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  const renderPacientes = () => (
+    <>
+      <div style={{ marginBottom: "12px", display: "flex", gap: "8px" }}>
+        <input type="text" placeholder="Buscar paciente por nome ou CPF..." style={{ flex: 1, padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--gray-200)", fontSize: "12px" }} />
+      </div>
+      <div className="card">
+        <div className="card-title">👥 Meus Pacientes Ativos</div>
+        <div className="patient-item" onClick={() => setActiveTab("prontuario")} style={{ cursor: "pointer", border: "1px solid var(--blue-pale)", background: "var(--gray-50)" }}>
+          <div className="avatar" style={{ background: "transparent", fontSize: "24px" }}>👩🏽‍🦱</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "12px", fontWeight: 800, color: "var(--blue-dark)" }}>Maria Silva, 51a</div>
+            <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>Dislipidemia · Prevenção Secundária</div>
+          </div>
+          <div><div className="badge badge-green">100% Adesão Hoje</div></div>
+        </div>
+        <div className="patient-item">
+          <div className="avatar" style={{ background: "#7c3aed" }}>RT</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "12px", fontWeight: 700 }}>Roberto T., 66a</div>
+            <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>Diabetes T2 · Insulina Glargina</div>
+          </div>
+          <div><div className="badge badge-yellow">71%</div></div>
+        </div>
+        <div className="patient-item">
+          <div className="avatar" style={{ background: "#dc2626" }}>LF</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "12px", fontWeight: 700 }}>Luísa F., 44a</div>
+            <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>Esclerose Múltipla · Interferon</div>
+          </div>
+          <div><div className="badge badge-red">38%</div></div>
+        </div>
+      </div>
+    </>
+  );
+
+  const renderAgenda = () => (
+    <>
+      <div className="card">
+        <div className="card-title">📅 Agenda — Segunda, 28 Abr</div>
+        <div className="timeline-item">
+          <div className="timeline-dot" style={{ background: "var(--blue-pale)" }}>🎥</div>
+          <div className="timeline-content">
+            <div className="timeline-title">Teleconsulta — Maria Silva</div>
+            <div className="timeline-desc">Acompanhamento e ajuste de rotina CEAF</div>
+            <div className="timeline-time">14h00 · 30 min</div>
+            <button className="btn btn-primary btn-sm" style={{ marginTop: "8px" }}>Iniciar Videochamada</button>
+          </div>
+        </div>
+        <div className="timeline-item">
+          <div className="timeline-dot" style={{ background: "#dcfce7" }}>💬</div>
+          <div className="timeline-content">
+            <div className="timeline-title">Consulta Presencial — João S.</div>
+            <div className="timeline-desc">1ª dispensação Adalimumabe</div>
+            <div className="timeline-time">16h30 · 45 min</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  const renderAlertas = () => (
+    <>
+      <div className="card">
+        <div className="card-title">🚨 Central de Alertas</div>
+        <div style={{ fontSize: "11px", color: "var(--gray-500)", marginBottom: "12px" }}>Alertas gerados automaticamente pelo sistema e pelo Tira-Dúvidas IA.</div>
+        
+        <div className="alert-patient yellow">
+          <div>
+            <div className="ap-name">Maria Silva 👩🏽‍🦱</div>
+            <div className="ap-reason"><b>Tira-Dúvidas IA:</b> Paciente relatou sentir náuseas pela manhã, questionando possível efeito adverso.</div>
+          </div>
+          <div style={{ marginLeft: "auto" }}><div className="badge badge-yellow">IA Report</div></div>
+        </div>
+
+        <div className="alert-patient red">
+          <div>
+            <div className="ap-name">Carlos M., 58a</div>
+            <div className="ap-reason"><b>Sistema:</b> Paciente não compareceu para retirar medicamento CEAF há 45 dias.</div>
+          </div>
+          <div style={{ marginLeft: "auto" }}><div className="badge badge-red">Adesão Crítica</div></div>
+        </div>
+      </div>
+    </>
+  );
+
+  const renderProntuario = () => (
+    <>
+      <div className="card" style={{ display: "flex", alignItems: "center", gap: "12px", background: "var(--blue-pale)", border: "none" }}>
+        <div style={{ fontSize: "32px" }}>👩🏽‍🦱</div>
+        <div>
+          <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--blue-dark)" }}>Maria Silva</div>
+          <div style={{ fontSize: "11px", color: "var(--gray-600)" }}>51 anos · CEAF Ativo · Adesão: 100%</div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">💊 Farmacoterapia Atual</div>
+        {mariaMeds.map(med => (
+          <div key={med.name} style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--gray-100)", padding: "8px 0" }}>
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 700 }}>{med.name}</div>
+              <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>{med.dose}</div>
+            </div>
+            <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--blue)", display: "flex", alignItems: "center" }}>
+              {med.freq}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="card-title">📝 Evolução Farmacêutica (SOAP)</div>
+        <div style={{ background: "var(--gray-50)", borderRadius: "8px", padding: "10px", fontSize: "11px", color: "var(--gray-700)", lineHeight: 1.5, border: "1px solid var(--gray-100)" }}>
+          <b style={{ color: "var(--blue-dark)" }}>S:</b> Paciente relatou náusea via Tira-Dúvidas IA.<br/>
+          <b style={{ color: "var(--blue-dark)" }}>O:</b> Adesão reportada de 100% no app.<br/>
+          <b style={{ color: "var(--blue-dark)" }}>A:</b> Possível efeito adverso leve comum no início do tratamento.<br/>
+          <b style={{ color: "var(--blue-dark)" }}>P:</b> Teleconsulta agendada para acompanhar e orientar sobre ingestão junto às refeições.
+        </div>
+        <button className="btn btn-outline btn-sm btn-full" style={{ marginTop: "10px" }}>+ Nova Evolução</button>
+      </div>
+    </>
+  );
 
   return (
     <div className="view active">
@@ -56,208 +233,50 @@ export default function FarmaceuticoView() {
                   <span>🔋</span>
                 </div>
               </div>
-              <div className="screen-title">Meus Pacientes</div>
-              <div className="screen-subtitle">48 ativos · 3 alertas críticos</div>
+              <div className="screen-title">
+                {activeTab === "inicio" ? "Painel Geral" : 
+                 activeTab === "pacientes" ? "Meus Pacientes" :
+                 activeTab === "agenda" ? "Agenda" :
+                 activeTab === "alertas" ? "Alertas Clínicos" : "Prontuário"}
+              </div>
+              <div className="screen-subtitle">Farm. Ana Beatriz</div>
             </div>
 
             <div className="screen-body">
-              {/* KPIs */}
-              <div className="stats-row">
-                <div className="stat-box">
-                  <div className="stat-num" style={{ color: "var(--green)" }}>
-                    82%
-                  </div>
-                  <div className="stat-label">Adesão média</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-num" style={{ color: "var(--red)" }}>
-                    5
-                  </div>
-                  <div className="stat-label">Em risco</div>
-                </div>
-              </div>
-
-              {/* Alertas críticos */}
-              <div className="card" style={{ border: "1px solid #fca5a5" }}>
-                <div className="card-title">🚨 Alertas Clínicos</div>
-                <div className="alert-patient red">
-                  <div>
-                    <div className="ap-name">Carlos M., 58a</div>
-                    <div className="ap-reason">Não retirou medicamento há 45 dias</div>
-                  </div>
-                  <div style={{ marginLeft: "auto" }}>
-                    <div className="badge badge-red">Crítico</div>
-                  </div>
-                </div>
-                <div className="alert-patient yellow">
-                  <div>
-                    <div className="ap-name">Ana P., 63a</div>
-                    <div className="ap-reason">Relatou efeito adverso grave ontem</div>
-                  </div>
-                  <div style={{ marginLeft: "auto" }}>
-                    <div className="badge badge-yellow">Atenção</div>
-                  </div>
-                </div>
-                <div className="alert-patient yellow">
-                  <div>
-                    <div className="ap-name">João S., 72a</div>
-                    <div className="ap-reason">Adesão: 40% esta semana</div>
-                  </div>
-                  <div style={{ marginLeft: "auto" }}>
-                    <div className="badge badge-yellow">Atenção</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Lista de pacientes */}
-              <div className="card">
-                <div className="card-title">👥 Pacientes Recentes</div>
-                <div className="patient-item">
-                  <div className="avatar" style={{ background: "var(--blue)" }}>
-                    MS
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "12px", fontWeight: 700 }}>Maria Silva, 51a</div>
-                    <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>
-                      Artrite Reumatoide · Metotrexato
-                    </div>
-                  </div>
-                  <div>
-                    <div className="badge badge-green">92%</div>
-                  </div>
-                </div>
-                <div className="patient-item">
-                  <div className="avatar" style={{ background: "#7c3aed" }}>
-                    RT
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "12px", fontWeight: 700 }}>Roberto T., 66a</div>
-                    <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>
-                      Diabetes T2 · Insulina Glargina
-                    </div>
-                  </div>
-                  <div>
-                    <div className="badge badge-yellow">71%</div>
-                  </div>
-                </div>
-                <div className="patient-item">
-                  <div className="avatar" style={{ background: "#dc2626" }}>
-                    LF
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "12px", fontWeight: 700 }}>Luísa F., 44a</div>
-                    <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>
-                      Esclerose Múltipla · Interferon
-                    </div>
-                  </div>
-                  <div>
-                    <div className="badge badge-red">38%</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Agenda */}
-              <div className="card">
-                <div className="card-title">📅 Agenda de Hoje</div>
-                <div className="timeline-item">
-                  <div className="timeline-dot" style={{ background: "var(--blue-pale)" }}>
-                    🎥
-                  </div>
-                  <div className="timeline-content">
-                    <div className="timeline-title">Teleconsulta — Maria Silva</div>
-                    <div className="timeline-desc">Revisão farmacoterapêutica mensal</div>
-                    <div className="timeline-time">14h00 · 30 min</div>
-                  </div>
-                </div>
-                <div className="timeline-item">
-                  <div className="timeline-dot" style={{ background: "#dcfce7" }}>
-                    💬
-                  </div>
-                  <div className="timeline-content">
-                    <div className="timeline-title">Consulta presencial — João S.</div>
-                    <div className="timeline-desc">1ª dispensação Adalimumabe</div>
-                    <div className="timeline-time">16h30 · 45 min</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Intervenções */}
-              <div className="card">
-                <div className="card-title">📝 Prontuário Farmacêutico</div>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    color: "var(--gray-700)",
-                    marginBottom: "6px",
-                  }}
-                >
-                  Maria Silva — Última intervenção
-                </div>
-                <div
-                  style={{
-                    background: "var(--gray-50)",
-                    borderRadius: "8px",
-                    padding: "10px",
-                    fontSize: "11px",
-                    color: "var(--gray-700)",
-                    lineHeight: 1.5,
-                    border: "1px solid var(--gray-100)",
-                  }}
-                >
-                  Paciente relatou náusea após uso do MTX. Orientada a tomar após refeição. Reforçada
-                  importância do ácido fólico. Adesão boa (92%). Sem alteração de conduta.
-                </div>
-                <button className="btn btn-outline btn-sm btn-full" style={{ marginTop: "10px" }}>
-                  + Nova Intervenção
-                </button>
-              </div>
-
-              {/* Adesão geral */}
-              <div className="card">
-                <div className="card-title">📊 Adesão da Carteira</div>
-                <div className="mini-chart">
-                  <div className="bar" style={{ height: "75%", background: "var(--blue-light)" }}></div>
-                  <div className="bar" style={{ height: "88%", background: "var(--green)" }}></div>
-                  <div className="bar" style={{ height: "82%", background: "var(--green)" }}></div>
-                  <div className="bar" style={{ height: "65%", background: "var(--yellow-dark)" }}></div>
-                  <div className="bar" style={{ height: "90%", background: "var(--green)" }}></div>
-                  <div className="bar" style={{ height: "78%", background: "var(--blue-light)" }}></div>
-                  <div className="bar" style={{ height: "82%", background: "var(--green)" }}></div>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Seg</span>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Ter</span>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Qua</span>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Qui</span>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Sex</span>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Sáb</span>
-                  <span style={{ fontSize: "9px", color: "var(--gray-500)" }}>Dom</span>
-                </div>
+              <div key={activeTab} className="tab-content">
+                {activeTab === "inicio" && renderInicio()}
+                {activeTab === "pacientes" && renderPacientes()}
+                {activeTab === "agenda" && renderAgenda()}
+                {activeTab === "alertas" && renderAlertas()}
+                {activeTab === "prontuario" && renderProntuario()}
               </div>
             </div>
 
             <div className="bottom-nav">
-              <div className="nav-item active">
+              <div className={`nav-item ${activeTab === "inicio" ? "active" : ""}`} onClick={() => setActiveTab("inicio")}>
                 <div className="nav-icon">🏠</div>
                 <div className="nav-label">Início</div>
-                <div className="nav-dot"></div>
+                {activeTab === "inicio" && <div className="nav-dot"></div>}
               </div>
-              <div className="nav-item">
+              <div className={`nav-item ${activeTab === "pacientes" ? "active" : ""}`} onClick={() => setActiveTab("pacientes")}>
                 <div className="nav-icon">👥</div>
                 <div className="nav-label">Pacientes</div>
+                {activeTab === "pacientes" && <div className="nav-dot"></div>}
               </div>
-              <div className="nav-item">
+              <div className={`nav-item ${activeTab === "agenda" ? "active" : ""}`} onClick={() => setActiveTab("agenda")}>
                 <div className="nav-icon">📅</div>
                 <div className="nav-label">Agenda</div>
+                {activeTab === "agenda" && <div className="nav-dot"></div>}
               </div>
-              <div className="nav-item">
+              <div className={`nav-item ${activeTab === "alertas" ? "active" : ""}`} onClick={() => setActiveTab("alertas")}>
                 <div className="nav-icon">🚨</div>
                 <div className="nav-label">Alertas</div>
+                {activeTab === "alertas" && <div className="nav-dot"></div>}
               </div>
-              <div className="nav-item">
+              <div className={`nav-item ${activeTab === "prontuario" ? "active" : ""}`} onClick={() => setActiveTab("prontuario")}>
                 <div className="nav-icon">📋</div>
                 <div className="nav-label">Prontuário</div>
+                {activeTab === "prontuario" && <div className="nav-dot"></div>}
               </div>
             </div>
           </div>
