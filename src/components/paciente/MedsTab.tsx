@@ -1,55 +1,16 @@
 import React, { useState } from "react";
+import { Medicine } from "../../types";
 
-interface Medicine {
-  id: string;
-  name: string;
-  dosage: string;
-  stock: number;
-  reserved: boolean;
+interface MedsTabProps {
+  meds: Medicine[];
+  setMeds: React.Dispatch<React.SetStateAction<Medicine[]>>;
 }
 
-const initialMeds: Medicine[] = [
-  {
-    id: "m1",
-    name: "Losartana Potássica",
-    dosage: "50mg",
-    stock: 120,
-    reserved: false,
-  },
-  {
-    id: "m2",
-    name: "Cloridrato de Metformina",
-    dosage: "500mg",
-    stock: 45,
-    reserved: false,
-  },
-  {
-    id: "m3",
-    name: "Omeprazol",
-    dosage: "20mg",
-    stock: 0,
-    reserved: false,
-  },
-  {
-    id: "m4",
-    name: "Dipirona Monoidratada",
-    dosage: "500mg",
-    stock: 200,
-    reserved: false,
-  },
-  {
-    id: "m5",
-    name: "Simvastatina",
-    dosage: "20mg",
-    stock: 10,
-    reserved: false,
-  },
-];
+export default function MedsTab({ meds, setMeds }: MedsTabProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-export default function MedsTab() {
-  const [meds, setMeds] = useState<Medicine[]>(initialMeds);
-
-  const handleReserve = (id: string) => {
+  const handleReserve = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setMeds((prevMeds) =>
       prevMeds.map((med) => {
         if (med.id === id && med.stock > 0 && !med.reserved) {
@@ -60,6 +21,126 @@ export default function MedsTab() {
     );
   };
 
+  const selectedMed = meds.find(m => m.id === expandedId);
+
+  // Se houver um medicamento selecionado, renderizamos a página de detalhes "por cima" 
+  // (mas dentro do fluxo normal da tela, com margin negativa para preencher a tela)
+  if (selectedMed) {
+    return (
+      <div style={{ 
+        margin: "-16px", 
+        background: "var(--gray-50)", 
+        minHeight: "calc(100% + 32px)",
+        display: "flex",
+        flexDirection: "column",
+        animation: "fadeIn 0.2s ease"
+      }}>
+        {/* Header do Modal */}
+        <div style={{ 
+          background: "linear-gradient(135deg, var(--blue-dark) 0%, #1565C0 100%)", 
+          padding: "24px 20px 32px 20px", 
+          position: "relative",
+          color: "white"
+        }}>
+          <button 
+            onClick={() => setExpandedId(null)}
+            style={{ position: "absolute", top: "20px", right: "20px", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", cursor: "pointer", color: "white" }}
+          >
+            ×
+          </button>
+          <div style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "var(--yellow)", marginBottom: "8px", marginTop: "16px" }}>
+            Guia do Paciente
+          </div>
+          <h1 style={{ fontSize: "24px", fontFamily: "'Poppins', sans-serif", fontWeight: 800, margin: "0 0 8px 0", lineHeight: 1.2 }}>
+            {selectedMed.name}
+          </h1>
+          <div style={{ fontSize: "14px", opacity: 0.9 }}>
+            {selectedMed.dosage} • {selectedMed.info.categoria}
+          </div>
+        </div>
+
+        {/* Conteúdo Principal */}
+        <div style={{ 
+          background: "white", 
+          borderTopLeftRadius: "24px", 
+          borderTopRightRadius: "24px", 
+          marginTop: "-20px", 
+          padding: "32px 20px", 
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: "24px"
+        }}>
+          
+          {/* O Que É */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--blue-pale)", color: "var(--blue-dark)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
+                ℹ️
+              </div>
+              <h2 style={{ fontSize: "18px", fontFamily: "'Poppins', sans-serif", fontWeight: 700, margin: 0, color: "var(--blue-dark)" }}>
+                Como funciona?
+              </h2>
+            </div>
+            <p style={{ fontSize: "14px", color: "var(--gray-700)", lineHeight: "1.7", margin: 0 }}>
+              {selectedMed.info.descricao}
+            </p>
+          </div>
+
+          {/* Grid de Detalhes */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            {selectedMed.info.detalhes.map((det, idx) => (
+              <div key={idx} style={{ background: "var(--blue-pale)", borderLeft: "4px solid var(--blue-light)", borderRadius: "10px", padding: "14px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: "var(--blue)", marginBottom: "4px" }}>
+                  {det.label}
+                </div>
+                <div style={{ fontSize: "13px", color: "var(--gray-800)", lineHeight: "1.5" }}>
+                  {det.value}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Alertas */}
+          {selectedMed.info.alerta && (
+            <div style={{ background: "linear-gradient(135deg, #FFF3CD, #FFF9E5)", border: "2px solid var(--yellow)", borderRadius: "14px", padding: "18px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
+              <div style={{ fontSize: "28px", flexShrink: 0 }}>💛</div>
+              <div style={{ fontSize: "14px", lineHeight: "1.6", color: "var(--gray-800)" }}>
+                {selectedMed.info.alerta}
+              </div>
+            </div>
+          )}
+
+          {/* Rodízio (Insulina) */}
+          {selectedMed.info.rodizio && (
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#fefce8", color: "var(--blue-dark)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
+                  🔄
+                </div>
+                <h2 style={{ fontSize: "18px", fontFamily: "'Poppins', sans-serif", fontWeight: 700, margin: 0, color: "var(--blue-dark)" }}>
+                  Rodízio de Aplicação
+                </h2>
+              </div>
+              <div style={{ background: "var(--gray-50)", border: "1px solid var(--gray-200)", borderRadius: "14px", padding: "20px" }}>
+                <p style={{ fontSize: "14px", color: "var(--gray-700)", lineHeight: "1.6", margin: "0 0 16px 0" }}>
+                  Aplicar sempre no mesmo ponto causa <strong>lipodistrofia</strong> (endurecimento) que prejudica a absorção da insulina. Use o rodízio para garantir eficácia!
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ background: "var(--yellow)", color: "var(--blue-dark)", fontSize: "12px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px" }}>Braços (parte externa)</div>
+                  <div style={{ background: "var(--yellow)", color: "var(--blue-dark)", fontSize: "12px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px" }}>Abdômen (lateral)</div>
+                  <div style={{ background: "var(--yellow)", color: "var(--blue-dark)", fontSize: "12px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px" }}>Coxas (frente/lateral)</div>
+                  <div style={{ background: "var(--yellow)", color: "var(--blue-dark)", fontSize: "12px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px" }}>Glúteos</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Lista Principal de Medicamentos (se não houver nenhum selecionado para ver o guia)
   return (
     <>
       <div className="card" style={{ border: "none", boxShadow: "none", padding: "0 0 16px 0", background: "transparent" }}>
@@ -67,40 +148,52 @@ export default function MedsTab() {
           Farmácia Digital
         </div>
         <div style={{ fontSize: "12px", color: "var(--gray-500)" }}>
-          Consulte o estoque e reserve seus medicamentos na unidade mais próxima.
+          Consulte o estoque e aprenda mais sobre o seu tratamento.
         </div>
       </div>
 
       <div className="card">
-        <div className="card-title">💊 Medicamentos Disponíveis</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div className="card-title">💊 Meus Medicamentos</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {meds.map((med) => (
-            <div key={med.id} className="med-item" style={{ flexDirection: "column", alignItems: "stretch", padding: "12px" }}>
+            <div 
+              key={med.id} 
+              className="med-item" 
+              style={{ flexDirection: "column", alignItems: "stretch", padding: "12px", border: "1px solid var(--gray-100)", transition: "all 0.2s", background: "white" }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div className="med-icon" style={{ background: "var(--blue-pale)", color: "var(--blue)" }}>
-                  💊
+                <div className="med-icon" style={{ 
+                  background: med.info.categoria === "Injetável" ? "#E3F2FD" : "var(--gray-50)", 
+                  color: med.info.categoria === "Injetável" ? "#1E88E5" : "var(--gray-600)",
+                  width: "44px", height: "44px"
+                }}>
+                  {med.info.categoria === "Injetável" ? "💉" : "💊"}
                 </div>
-                <div className="med-info">
-                  <div className="med-name">{med.name}</div>
+                <div className="med-info" style={{ flex: 1 }}>
+                  <div style={{ fontSize: "10px", fontWeight: 800, color: med.info.categoria === "Injetável" ? "#1E88E5" : "var(--gray-500)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>
+                    {med.info.categoria}
+                  </div>
+                  <div className="med-name" style={{ fontSize: "14px" }}>{med.name}</div>
                   <div className="med-dose">{med.dosage}</div>
                 </div>
+                
+                {/* Botão Ver Guia fica ao lado das informações básicas */}
+                <button
+                  className="btn btn-primary btn-sm"
+                  style={{ padding: "8px 16px", fontSize: "11px", borderRadius: "30px", flexShrink: 0 }}
+                  onClick={() => setExpandedId(med.id)}
+                >
+                  📖 Ver Guia
+                </button>
               </div>
               
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid var(--gray-100)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "14px", paddingTop: "14px", borderTop: "1px solid var(--gray-100)" }}>
                 <div>
                   <div style={{ fontSize: "10px", color: "var(--gray-500)", fontWeight: 700 }}>ESTOQUE NA UNIDADE</div>
                   <div style={{ fontSize: "14px", fontWeight: 800, color: med.stock > 0 ? "var(--green)" : "var(--red)" }}>
                     {med.stock > 0 ? `${med.stock} caixas` : "Indisponível"}
                   </div>
                 </div>
-                <button
-                  className={`btn ${med.reserved ? "btn-outline" : "btn-primary"} btn-sm`}
-                  style={{ opacity: med.stock === 0 && !med.reserved ? 0.5 : 1, cursor: med.stock === 0 && !med.reserved ? "not-allowed" : "pointer" }}
-                  disabled={med.stock === 0 || med.reserved}
-                  onClick={() => handleReserve(med.id)}
-                >
-                  {med.reserved ? "✓ Reservado" : "Reservar"}
-                </button>
               </div>
             </div>
           ))}

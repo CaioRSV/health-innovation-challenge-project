@@ -6,16 +6,33 @@ import MedsTab from "./paciente/MedsTab";
 import GuiaTab from "./paciente/GuiaTab";
 import ChatTab from "./paciente/ChatTab";
 import PerfilTab from "./paciente/PerfilTab";
+import { initialMeds, Medicine } from "../types";
+
+export interface UserProfile {
+  name: string;
+  avatar: string;
+}
 
 export default function PacienteView() {
   const [activeTab, setActiveTab] = useState("inicio");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Shared state
+  const [profile, setProfile] = useState<UserProfile>({ name: "Maria Silva", avatar: "👩🏽‍🦱" });
+  const [meds, setMeds] = useState<Medicine[]>(initialMeds);
+  const [medsDone, setMedsDone] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    initialMeds.filter(m => m.isDaily).forEach((m, idx) => {
+      initial[m.id] = idx < 2;
+    });
+    return initial;
+  });
 
   return (
     <div className="view active">
       <div className="hero-strip">
         <div className="hero-title">
-          Olá, <span>Maria Silva</span> 👋
+          Olá, <span>{profile.name}</span> {profile.avatar}
         </div>
         <div className="hero-sub">
           Bem-vinda ao Conecta Farma. Aqui você não está sozinha no seu tratamento — acompanhamos você
@@ -24,7 +41,7 @@ export default function PacienteView() {
         <div className="hero-tags">
           <div className="hero-tag">💊 CEAF Ativo</div>
           <div className="hero-tag">📅 Renovação: 15 Mai</div>
-          <div className="hero-tag">🟢 3 medicamentos</div>
+          <div className="hero-tag">🟢 {meds.length} medicamentos</div>
         </div>
       </div>
 
@@ -71,11 +88,11 @@ export default function PacienteView() {
             {/* Body */}
             <div className="screen-body">
               <div key={activeTab} className="tab-content">
-                {activeTab === "inicio" && <InicioTab />}
-                {activeTab === "meds" && <MedsTab />}
+                {activeTab === "inicio" && <InicioTab meds={meds} medsDone={medsDone} setMedsDone={setMedsDone} onNavigate={(tab) => setActiveTab(tab)} />}
+                {activeTab === "meds" && <MedsTab meds={meds} setMeds={setMeds} />}
                 {activeTab === "guia" && <GuiaTab />}
-                {activeTab === "chat" && <ChatTab />}
-                {activeTab === "perfil" && <PerfilTab />}
+                {activeTab === "chat" && <ChatTab profile={profile} />}
+                {activeTab === "perfil" && <PerfilTab profile={profile} setProfile={setProfile} meds={meds} setMeds={setMeds} setMedsDone={setMedsDone} />}
               </div>
             </div>
 
