@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Medicine } from "../../types";
+import { RegistrationData } from "../PacienteView";
 
 interface UserProfile {
   name: string;
@@ -12,6 +13,10 @@ interface PerfilTabProps {
   meds: Medicine[];
   setMeds: React.Dispatch<React.SetStateAction<Medicine[]>>;
   setMedsDone: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  isDarkMode: boolean;
+  setIsDarkMode: (val: boolean) => void;
+  registration?: RegistrationData | null;
+  onReset?: () => void;
 }
 
 const availableAvatars = [
@@ -69,7 +74,7 @@ const predeterminedMeds: Medicine[] = [
   }
 ];
 
-export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsDone }: PerfilTabProps) {
+export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsDone, isDarkMode, setIsDarkMode, registration, onReset }: PerfilTabProps) {
   const [editingName, setEditingName] = useState(profile.name);
   const [editingAvatar, setEditingAvatar] = useState(profile.avatar);
   const [showAvatarSelect, setShowAvatarSelect] = useState(false);
@@ -148,7 +153,7 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
               {editingAvatar || getInitials(editingName || "User")}
               <div style={{
                 position: "absolute", bottom: "-4px", right: "-4px", 
-                background: "white", borderRadius: "50%", width: "28px", height: "28px",
+                background: "var(--white)", borderRadius: "50%", width: "28px", height: "28px",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 2px 5px rgba(0,0,0,0.2)", fontSize: "12px"
               }}>
@@ -159,7 +164,7 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
             {showAvatarSelect && (
               <div style={{ 
                 position: "absolute", top: "90px", left: "50%", transform: "translateX(-50%)",
-                background: "white", padding: "12px", borderRadius: "16px",
+                background: "var(--white)", padding: "12px", borderRadius: "16px",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 100,
                 display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "8px",
                 width: "220px"
@@ -200,7 +205,7 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
             <input 
               value={editingName}
               onChange={(e) => setEditingName(e.target.value)}
-              style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid var(--gray-200)", fontFamily: "var(--font-nunito)", fontSize: "16px" }}
+              style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid var(--gray-200)", background: "var(--white)", color: "var(--gray-900)", fontFamily: "var(--font-nunito)", fontSize: "16px" }}
             />
           </div>
 
@@ -210,16 +215,82 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
         </div>
       </div>
 
+      {/* SEÇÃO 1.2: DADOS CLÍNICOS (Apenas se cadastrado) */}
+      {registration && (
+        <div className="card">
+          <div className="card-title">📋 Informações Clínicas</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px", fontSize: "13px", color: "var(--gray-700)" }}>
+            <div>
+              <strong>Modo de Uso:</strong> {registration.role === "cuidador" ? "Cuidador / Responsável" : "Paciente"}
+            </div>
+            {registration.role === "cuidador" ? (
+              <>
+                <div>
+                  <strong>Cuidador:</strong> {registration.userName} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {registration.userDob})</span>
+                </div>
+                <div>
+                  <strong>Paciente:</strong> {registration.patientName} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {registration.patientDob})</span>
+                </div>
+              </>
+            ) : (
+              <div>
+                <strong>Paciente:</strong> {registration.userName} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {registration.userDob})</span>
+              </div>
+            )}
+            <div style={{ borderTop: "1px dashed var(--gray-100)", paddingTop: "8px", marginTop: "4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <div>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--gray-500)", display: "block" }}>ALTURA DO PACIENTE</span>
+                <strong>{registration.height} cm</strong>
+              </div>
+              <div>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--gray-500)", display: "block" }}>PESO DO PACIENTE</span>
+                <strong>{registration.weight} kg</strong>
+              </div>
+            </div>
+            <div style={{ borderTop: "1px dashed var(--gray-100)", paddingTop: "8px" }}>
+              <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--gray-500)", display: "block" }}>CONDIÇÃO CLÍNICA</span>
+              <strong>{registration.clinicalCondition}</strong>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SEÇÃO 1.5: ACESSIBILIDADE E TEMA */}
+      <div className="card">
+        <div className="card-title">🌓 Tema / Acessibilidade</div>
+        <div style={{ fontSize: "11px", color: "var(--gray-500)", marginBottom: "12px", lineHeight: "1.4" }}>
+          Escolha o tema visual do aplicativo. O Modo Acessibilidade utiliza o tema escuro para facilitar a leitura.
+        </div>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button 
+            className={`btn btn-sm btn-full ${!isDarkMode ? "btn-primary" : "btn-outline"}`}
+            onClick={() => setIsDarkMode(false)}
+            style={{ borderRadius: "20px" }}
+          >
+            ☀️ Claro
+          </button>
+          <button 
+            className={`btn btn-sm btn-full ${isDarkMode ? "btn-yellow" : "btn-outline"}`}
+            onClick={() => setIsDarkMode(true)}
+            style={{ borderRadius: "20px" }}
+          >
+            🌙 Escuro (Acessibilidade)
+          </button>
+        </div>
+      </div>
+
       {/* SEÇÃO 2: MEDICAMENTOS */}
       <div className="card">
         <div className="card-title" style={{ justifyContent: "space-between", display: "flex" }}>
-          <span>💊 Meus Medicamentos</span>
+          <span>{registration?.role === "cuidador" ? `💊 Medicamentos de ${registration.patientName}` : "💊 Meus Medicamentos"}</span>
           <button className="btn btn-yellow btn-sm" onClick={() => setShowAddMed(!showAddMed)}>
             {showAddMed ? "Cancelar" : "+ Adicionar"}
           </button>
         </div>
         <div style={{ fontSize: "11px", color: "var(--gray-500)", marginBottom: "16px", lineHeight: "1.4" }}>
-          Gerencie seu tratamento. Medicamentos marcados como "Uso Diário" aparecem no seu checklist diário na aba Início.
+          {registration?.role === "cuidador"
+            ? `Gerencie o tratamento de ${registration.patientName}. Medicamentos marcados como "Uso Diário" aparecem no checklist diário na aba Início.`
+            : "Gerencie seu tratamento. Medicamentos marcados como \"Uso Diário\" aparecem no seu checklist diário na aba Início."}
         </div>
 
         {/* Modal/Lista para Adicionar Novos Medicamentos */}
@@ -229,11 +300,11 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
               Selecione o medicamento para adicionar:
             </div>
             {medsToAdd.length === 0 ? (
-              <div style={{ fontSize: "12px", color: "var(--gray-600)" }}>Todos os medicamentos disponíveis já foram adicionados.</div>
+              <div style={{ fontSize: "12px", color: "var(--gray-500)" }}>Todos os medicamentos disponíveis já foram adicionados.</div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {medsToAdd.map(m => (
-                  <div key={m.id} style={{ background: "white", padding: "10px 14px", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div key={m.id} style={{ background: "var(--white)", padding: "10px 14px", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <div style={{ fontSize: "13px", fontWeight: 800 }}>{m.name}</div>
                       <div style={{ fontSize: "11px", color: "var(--gray-500)" }}>{m.dosage}</div>
@@ -253,12 +324,12 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
             <div style={{ fontSize: "12px", color: "var(--gray-500)", textAlign: "center", padding: "16px 0" }}>Nenhum medicamento cadastrado.</div>
           ) : (
             meds.map((med) => (
-              <div key={med.id} style={{ border: "1px solid var(--gray-200)", borderRadius: "10px", padding: "12px", display: "flex", flexDirection: "column", gap: "10px", background: "white" }}>
+              <div key={med.id} style={{ border: "1px solid var(--gray-200)", borderRadius: "10px", padding: "12px", display: "flex", flexDirection: "column", gap: "10px", background: "var(--white)" }}>
                 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--blue-dark)" }}>{med.name}</div>
-                    <div style={{ fontSize: "11px", color: "var(--gray-600)", marginTop: "2px" }}>{med.dosage} • {med.info.categoria}</div>
+                    <div style={{ fontSize: "11px", color: "var(--gray-500)", marginTop: "2px" }}>{med.dosage} • {med.info.categoria}</div>
                   </div>
                   <button 
                     onClick={() => deleteMed(med.id)}
@@ -303,6 +374,29 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
           )}
         </div>
       </div>
+
+      {/* SEÇÃO 3: REINICIAR */}
+      {onReset && registration && (
+        <div style={{ marginTop: "8px", paddingBottom: "16px" }}>
+          <button 
+            className="btn btn-full"
+            onClick={onReset}
+            style={{ 
+              background: "var(--red)", 
+              color: "white", 
+              borderRadius: "30px",
+              border: "none",
+              fontWeight: "bold",
+              padding: "12px",
+              cursor: "pointer",
+              fontSize: "13px",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+            }}
+          >
+            🔄 Reiniciar Aplicativo & Cadastro
+          </button>
+        </div>
+      )}
     </div>
   );
 }

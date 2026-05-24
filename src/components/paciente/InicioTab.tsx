@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Medicine } from "../../types";
+import { RegistrationData } from "../PacienteView";
 
 interface InicioTabProps {
   meds: Medicine[];
   medsDone: Record<string, boolean>;
   setMedsDone: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   onNavigate?: (tab: string) => void;
+  registration?: RegistrationData | null;
 }
 
-export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: InicioTabProps) {
+export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate, registration }: InicioTabProps) {
   const dailyMeds = meds.filter((m) => m.isDaily);
 
   const toggleMed = (id: string) => {
@@ -49,7 +51,9 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
     <>
       {/* Adesão hoje */}
       <div className="card">
-        <div className="card-title">📊 Adesão de Hoje</div>
+        <div className="card-title">
+          {registration?.role === "cuidador" ? "📊 Administrado hoje" : "📊 Tomei hoje"}
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
           <div
             style={{
@@ -66,24 +70,32 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
               <div className={`progress-fill ${progressColorClass}`} style={{ width: `${percentage}%` }}></div>
             </div>
             <div style={{ fontSize: "10px", color: "var(--gray-500)", marginTop: "4px" }}>
-              {takenMeds} de {totalMeds} tomados
+              {takenMeds} de {totalMeds} {registration?.role === "cuidador" ? "administrados" : "tomados"}
             </div>
           </div>
         </div>
         {totalMeds === 0 ? (
           <div className="alert-strip info">Nenhum medicamento diário cadastrado</div>
         ) : missingMeds === 0 ? (
-          <div className="alert-strip success">✅ Todos os medicamentos tomados hoje!</div>
+          <div className="alert-strip success">
+            {registration?.role === "cuidador" ? "✅ Todos os medicamentos administrados!" : "✅ Todos os medicamentos tomados hoje!"}
+          </div>
         ) : missingMeds === 1 ? (
-          <div className="alert-strip warning">⏰ Falta 1 medicamento do dia</div>
+          <div className="alert-strip warning">
+            {registration?.role === "cuidador" ? "⏰ Falta administrar 1 medicamento" : "⏰ Falta 1 medicamento do dia"}
+          </div>
         ) : (
-          <div className="alert-strip danger">⏰ Faltam {missingMeds} medicamentos do dia</div>
+          <div className="alert-strip danger">
+            {registration?.role === "cuidador"
+              ? `⏰ Faltam administrar ${missingMeds} medicamentos`
+              : `⏰ Faltam ${missingMeds} medicamentos do dia`}
+          </div>
         )}
       </div>
 
       {/* Medicamentos */}
       <div className="card">
-        <div className="card-title">💊 Medicamentos do Dia</div>
+        <div className="card-title">💊 Lista de hoje</div>
         {dailyMeds.length === 0 ? (
           <div style={{ fontSize: "12px", color: "var(--gray-500)", textAlign: "center", padding: "10px" }}>
             Nenhum medicamento de uso diário.
@@ -99,8 +111,8 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
                   style={{ borderColor: isDone ? "#86efac" : "var(--gray-100)" }}
                 >
                   <div className="med-icon" style={{
-                    background: med.info.categoria === "Injetável" ? "#E3F2FD" : "var(--gray-50)",
-                    color: med.info.categoria === "Injetável" ? "#1E88E5" : "var(--gray-600)"
+                    background: med.info.categoria === "Injetável" ? "var(--blue-pale)" : "var(--gray-100)",
+                    color: med.info.categoria === "Injetável" ? "var(--blue)" : "var(--gray-500)"
                   }}>
                     {med.info.categoria === "Injetável" ? "💉" : "💊"}
                   </div>
@@ -108,12 +120,33 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
                     <div className="med-name">{med.name}</div>
                     <div className="med-dose">{med.dosage} · {med.info.categoria}</div>
                   </div>
-                  <div
-                    className={`med-check ${isDone ? "done" : ""}`}
-                    onClick={() => toggleMed(med.id)}
-                  >
-                    {isDone ? "✓" : "○"}
-                  </div>
+                  {registration?.role === "cuidador" ? (
+                    <button
+                      onClick={() => toggleMed(med.id)}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: "20px",
+                        border: "none",
+                        background: isDone ? "var(--green)" : "var(--blue)",
+                        color: "white",
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      {isDone ? "✓ Administrado" : "Confirmar tomada"}
+                    </button>
+                  ) : (
+                    <div
+                      className={`med-check ${isDone ? "done" : ""}`}
+                      onClick={() => toggleMed(med.id)}
+                    >
+                      {isDone ? "✓" : "○"}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -131,16 +164,16 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
 
           {showScheduleModal ? (
             <div style={{ background: "var(--gray-50)", padding: "16px", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px", border: "1px solid var(--gray-200)", marginTop: "8px" }}>
-              
+
               {/* 1. Escolha o Dia */}
               <div>
                 <div style={{ fontSize: "11px", fontWeight: 800, color: "var(--gray-500)", marginBottom: "8px" }}>1. ESCOLHA O DIA</div>
                 <div style={{ display: "flex", gap: "8px" }}>
                   {availableDays.map(day => (
-                    <div 
+                    <div
                       key={day.date}
                       onClick={() => { setSelectedDay(day.date); setSelectedTime(""); setSelectedDoctor(""); }}
-                      style={{ 
+                      style={{
                         flex: 1, padding: "10px 4px", borderRadius: "8px", textAlign: "center", cursor: "pointer",
                         border: selectedDay === day.date ? "2px solid var(--blue)" : "1px solid var(--gray-200)",
                         background: selectedDay === day.date ? "var(--blue)" : "var(--gray-100)",
@@ -161,10 +194,10 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
                   <div style={{ fontSize: "11px", fontWeight: 800, color: "var(--gray-500)", marginBottom: "8px" }}>2. HORÁRIO ({selectedDay})</div>
                   <div style={{ display: "flex", gap: "8px" }}>
                     {availableTimes.map(time => (
-                      <div 
+                      <div
                         key={time}
                         onClick={() => { setSelectedTime(time); setSelectedDoctor(""); }}
-                        style={{ 
+                        style={{
                           flex: 1, padding: "8px", borderRadius: "8px", textAlign: "center", cursor: "pointer", fontSize: "12px", fontWeight: 700,
                           border: selectedTime === time ? "2px solid var(--blue)" : "1px solid var(--gray-200)",
                           background: selectedTime === time ? "var(--blue)" : "var(--gray-100)",
@@ -185,10 +218,10 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
                   <div style={{ fontSize: "11px", fontWeight: 800, color: "var(--gray-500)", marginBottom: "8px" }}>3. PROFISSIONAL</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     {availableDoctors.map(doc => (
-                      <div 
+                      <div
                         key={doc}
                         onClick={() => setSelectedDoctor(doc)}
-                        style={{ 
+                        style={{
                           padding: "10px", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "10px",
                           border: selectedDoctor === doc ? "2px solid var(--blue)" : "1px solid var(--gray-200)",
                           background: selectedDoctor === doc ? "var(--blue)" : "var(--gray-100)",
@@ -262,15 +295,14 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate }: I
         </div>
       )}
 
-      {/* Chat Redirection */}
       <div
         className="card"
         style={{ border: "2px solid var(--blue-pale)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}
         onClick={() => onNavigate && onNavigate("chat")}
       >
         <div>
-          <div className="card-title" style={{ marginBottom: "4px" }}>💬 Tira-dúvidas IA</div>
-          <div style={{ fontSize: "12px", color: "var(--gray-600)" }}>Pergunte sobre seus medicamentos e tratamento 24/7.</div>
+          <div className="card-title" style={{ marginBottom: "4px" }}>💬 Suporte & Sintomas</div>
+          <div style={{ fontSize: "12px", color: "var(--gray-500)" }}>Reporte sintomas, tire dúvidas com o farmacêutico ou solicite ajuda.</div>
         </div>
         <div style={{ fontSize: "20px", color: "var(--blue)" }}>➔</div>
       </div>

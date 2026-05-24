@@ -14,7 +14,7 @@ export default function GuiaTab() {
 
       <div className="card" style={{ marginBottom: "14px" }}>
         <div className="card-title">📖 Guia Rápido</div>
-        
+
         <div className="feature-list">
           <div className="feature-item" style={{ background: "transparent", padding: "8px 0", border: "none", borderBottom: "1px solid var(--gray-100)", borderRadius: 0 }}>
             <div className="feat-icon" style={{ background: "var(--blue-pale)", color: "var(--blue)", fontSize: "14px" }}>
@@ -27,37 +27,25 @@ export default function GuiaTab() {
               </div>
             </div>
           </div>
-          
+
           <div className="feature-item" style={{ background: "transparent", padding: "8px 0", border: "none", borderBottom: "1px solid var(--gray-100)", borderRadius: 0 }}>
-            <div className="feat-icon" style={{ background: "var(--green-light)", color: "var(--green)", fontSize: "14px" }}>
-              💊
+            <div className="feat-icon" style={{ background: "var(--yellow-light)", color: "var(--yellow-dark)", fontSize: "14px" }}>
+              💬
             </div>
             <div>
-              <div className="feat-title">Meds (Farmácia Digital)</div>
+              <div className="feat-title">Chat</div>
               <div className="feat-desc" style={{ fontSize: "10px" }}>
-                Verifique a disponibilidade dos seus medicamentos na unidade de saúde e faça reservas antes de sair de casa.
+                Tire dúvidas sobre o seu tratamento ou relate reações adversas.
               </div>
             </div>
           </div>
 
-          <div className="feature-item" style={{ background: "transparent", padding: "8px 0", border: "none", borderBottom: "1px solid var(--gray-100)", borderRadius: 0 }}>
-            <div className="feat-icon" style={{ background: "#fef3c7", color: "var(--yellow-dark)", fontSize: "14px" }}>
-              💬
-            </div>
-            <div>
-              <div className="feat-title">Chat com Farmacêutico</div>
-              <div className="feat-desc" style={{ fontSize: "10px" }}>
-                Converse diretamente com o profissional de saúde para tirar dúvidas sobre o seu tratamento ou relatar sintomas.
-              </div>
-            </div>
-          </div>
-          
           <div className="feature-item" style={{ background: "transparent", padding: "8px 0", border: "none", borderRadius: 0 }}>
             <div className="feat-icon" style={{ background: "var(--red-light)", color: "var(--red)", fontSize: "14px" }}>
               🚨
             </div>
             <div>
-              <div className="feat-title">Relato de Efeitos Adversos</div>
+              <div className="feat-title">Relato de Eventos Adversos</div>
               <div className="feat-desc" style={{ fontSize: "10px" }}>
                 No Início, você encontra atalhos para avisar ao seu farmacêutico caso sinta náusea, cansaço ou outras reações.
               </div>

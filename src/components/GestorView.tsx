@@ -29,7 +29,7 @@ export default function GestorView() {
     <div className="view active">
       <div
         className="hero-strip"
-        style={{ background: "linear-gradient(135deg, #1a3f72 0%, #28599c 60%, #4a7ec4 100%)" }}
+        style={{ background: "linear-gradient(135deg, var(--nav-bg) 0%, var(--blue) 100%)" }}
       >
         <div className="hero-title">
           Painel <span>Gestão CEAF</span> 🏛
@@ -38,7 +38,6 @@ export default function GestorView() {
           Assistência Farmacêutica · Secretaria de Saúde de PE · Visão consolidada da plataforma em todo o estado
         </div>
         <div className="hero-tags">
-          <div className="hero-tag">12 farmácias integradas</div>
           <div className="hero-tag">3.847 pacientes CEAF</div>
           <div className="hero-tag">Dados atualizados: hoje</div>
         </div>
@@ -52,7 +51,7 @@ export default function GestorView() {
             style={{
               flex: 2,
               minWidth: "400px",
-              background: "white",
+              background: "var(--white)",
               borderRadius: "var(--radius)",
               padding: "24px",
               border: "1px solid var(--gray-100)",
@@ -90,7 +89,7 @@ export default function GestorView() {
           <div
             style={{
               flex: "1 1 400px",
-              background: "white",
+              background: "var(--white)",
               borderRadius: "var(--radius)",
               padding: "24px",
               border: "1px solid var(--gray-100)",
@@ -127,6 +126,8 @@ export default function GestorView() {
                 padding: "10px",
                 borderRadius: "8px",
                 border: "1px solid var(--gray-300)",
+                background: "var(--white)",
+                color: "var(--gray-900)",
                 marginBottom: "16px",
                 fontFamily: "inherit",
                 fontSize: "13px",
@@ -204,21 +205,21 @@ export default function GestorView() {
               </div>
               <div className="badge badge-red">Alto</div>
             </div>
-            <div className="risk-row" style={{ background: "#fffbeb" }}>
+            <div className="risk-row" style={{ background: "var(--yellow-light)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <div className="risk-indicator" style={{ background: "var(--yellow-dark)" }}></div>
                 <span>Tecnológico (infraestrutura)</span>
               </div>
               <div className="badge badge-yellow">Médio</div>
             </div>
-            <div className="risk-row" style={{ background: "#fffbeb" }}>
+            <div className="risk-row" style={{ background: "var(--yellow-light)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <div className="risk-indicator" style={{ background: "var(--yellow-dark)" }}></div>
                 <span>Uso do paciente (letramento)</span>
               </div>
               <div className="badge badge-yellow">Médio</div>
             </div>
-            <div className="risk-row" style={{ background: "#fffbeb" }}>
+            <div className="risk-row" style={{ background: "var(--yellow-light)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <div className="risk-indicator" style={{ background: "var(--yellow-dark)" }}></div>
                 <span>Institucional (integração)</span>
@@ -252,15 +253,6 @@ export default function GestorView() {
                 <div>
                   <div className="feat-title">Licitação por Inexigibilidade</div>
                   <div className="feat-desc">Solução exclusiva para o SUS-PE. Contratação direta com a Secretaria de Saúde.</div>
-                </div>
-              </div>
-              <div className="feature-item">
-                <div className="feat-icon" style={{ background: "#dcfce7" }}>
-                  💊
-                </div>
-                <div>
-                  <div className="feat-title">Redução de desperdício CEAF</div>
-                  <div className="feat-desc">Menos medicamentos não retirados = retorno financeiro indireto ao estado.</div>
                 </div>
               </div>
               <div className="feature-item">
@@ -411,42 +403,42 @@ export default function GestorView() {
             <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "#dcfce7", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--green)" }}>🧑‍⚕️</div>
+              <div style={{ width: "44px", height: "44px", background: "var(--green-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--green)" }}>🧑‍⚕️</div>
               <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>1ª Consulta</div>
               <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Farmacêutico + paciente</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "#fef3c7", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--yellow-dark)" }}>💊</div>
+              <div style={{ width: "44px", height: "44px", background: "var(--yellow-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--yellow-dark)" }}>💊</div>
               <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Dispensação</div>
               <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Mensal CEAF</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "#ffe4e6", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--red)" }}>📱</div>
+              <div style={{ width: "44px", height: "44px", background: "var(--red-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--red)" }}>📱</div>
               <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Monitoramento</div>
               <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Lembretes + adesão</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "#f3e8ff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid #7c3aed" }}>🚨</div>
+              <div style={{ width: "44px", height: "44px", background: "var(--blue-pale)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--blue)" }}>🚨</div>
               <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Alertas</div>
               <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Intervenção precoce</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "#dbeafe", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--blue)" }}>📖</div>
+              <div style={{ width: "44px", height: "44px", background: "var(--blue-pale)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--blue)" }}>📖</div>
               <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Educação</div>
               <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Guia do medicamento</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "#dcfce7", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--green)" }}>🎥</div>
+              <div style={{ width: "44px", height: "44px", background: "var(--green-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--green)" }}>🎥</div>
               <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Teleconsulta</div>
               <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Seguimento contínuo</div>
             </div>
@@ -455,9 +447,9 @@ export default function GestorView() {
             style={{
               marginTop: "16px",
               padding: "12px 16px",
-              background: "linear-gradient(135deg, var(--blue-pale), #f0fdf4)",
+              background: "linear-gradient(135deg, var(--blue-pale), var(--green-light))",
               borderRadius: "10px",
-              border: "1px solid #bfdbfe",
+              border: "1px solid var(--blue-light)",
             }}
           >
             <span
@@ -490,7 +482,7 @@ export default function GestorView() {
           padding: "20px"
         }} onClick={() => setSelectedPerson(null)}>
           <div style={{
-            background: "white",
+            background: "var(--white)",
             borderRadius: "var(--radius)",
             padding: "24px",
             width: "100%",

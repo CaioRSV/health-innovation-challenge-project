@@ -1,6 +1,30 @@
 globalThis.__BUILD_MANIFEST = {
   "pages": {
-    "/_app": []
+    "/_app": [
+      "static/chunks/0jp6_next_dist_compiled_0xwv2_w._.js",
+      "static/chunks/0jp6_next_dist_shared_lib_0l1zyb9._.js",
+      "static/chunks/0jp6_next_dist_client_09so91e._.js",
+      "static/chunks/0jp6_next_dist_0mp0nq4._.js",
+      "static/chunks/0jp6_next_app_0flo9o6.js",
+      "static/chunks/[next]_entry_page-loader_ts_0m1g.ye._.js",
+      "static/chunks/0jp6_react-dom_0f_kq-_._.js",
+      "static/chunks/0jp6_0yna_p0._.js",
+      "static/chunks/[root-of-the-server]__11y2-13._.js",
+      "static/chunks/02o1_saude_digital_health-innovation-challenge-project_pages__app_07xvfw~._.js",
+      "static/chunks/0r5v_saude_digital_health-innovation-challenge-project_pages__app_078gztn._.js"
+    ],
+    "/_error": [
+      "static/chunks/0jp6_next_dist_compiled_0xwv2_w._.js",
+      "static/chunks/0jp6_next_dist_shared_lib_0-9pmne._.js",
+      "static/chunks/0jp6_next_dist_client_09so91e._.js",
+      "static/chunks/0jp6_next_dist_01hwh75._.js",
+      "static/chunks/[next]_entry_page-loader_ts_00-i5lq._.js",
+      "static/chunks/0jp6_react-dom_0f_kq-_._.js",
+      "static/chunks/0jp6_0yna_p0._.js",
+      "static/chunks/[root-of-the-server]__0kumfle._.js",
+      "static/chunks/02o1_saude_digital_health-innovation-challenge-project_pages__error_07xvfw~._.js",
+      "static/chunks/0r5v_saude_digital_health-innovation-challenge-project_pages__error_0rzhu8j._.js"
+    ]
   },
   "devFiles": [],
   "polyfillFiles": [

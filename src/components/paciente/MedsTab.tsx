@@ -1,13 +1,33 @@
 import React, { useState } from "react";
 import { Medicine } from "../../types";
+import { RegistrationData } from "../PacienteView";
 
 interface MedsTabProps {
   meds: Medicine[];
   setMeds: React.Dispatch<React.SetStateAction<Medicine[]>>;
+  registration?: RegistrationData | null;
 }
 
-export default function MedsTab({ meds, setMeds }: MedsTabProps) {
+export default function MedsTab({ meds, setMeds, registration }: MedsTabProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const getStockDescription = (med: Medicine) => {
+    if (!med.stock || med.stock <= 0) return "Indisponível";
+
+    if (med.info.categoria === "Injetável") {
+      return `${med.stock} doses`;
+    } else if (med.info.categoria === "Oral") {
+      const comprimidos = med.stock;
+      const cartelas = Math.floor(comprimidos / 15);
+      if (cartelas > 1) {
+        return `${comprimidos} comprimidos (${cartelas} cartelas)`;
+      } else {
+        return `${comprimidos} comprimidos`;
+      }
+    } else {
+      return `${med.stock} unidades`;
+    }
+  };
 
   const handleReserve = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -27,22 +47,22 @@ export default function MedsTab({ meds, setMeds }: MedsTabProps) {
   // (mas dentro do fluxo normal da tela, com margin negativa para preencher a tela)
   if (selectedMed) {
     return (
-      <div style={{ 
-        margin: "-16px", 
-        background: "var(--gray-50)", 
+      <div style={{
+        margin: "-16px",
+        background: "var(--gray-50)",
         minHeight: "calc(100% + 32px)",
         display: "flex",
         flexDirection: "column",
         animation: "fadeIn 0.2s ease"
       }}>
         {/* Header do Modal */}
-        <div style={{ 
-          background: "linear-gradient(135deg, var(--blue-dark) 0%, #1565C0 100%)", 
-          padding: "24px 20px 32px 20px", 
+        <div style={{
+          background: "linear-gradient(135deg, var(--nav-bg) 0%, var(--blue) 100%)",
+          padding: "24px 20px 32px 20px",
           position: "relative",
           color: "white"
         }}>
-          <button 
+          <button
             onClick={() => setExpandedId(null)}
             style={{ position: "absolute", top: "20px", right: "20px", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", cursor: "pointer", color: "white" }}
           >
@@ -60,18 +80,18 @@ export default function MedsTab({ meds, setMeds }: MedsTabProps) {
         </div>
 
         {/* Conteúdo Principal */}
-        <div style={{ 
-          background: "white", 
-          borderTopLeftRadius: "24px", 
-          borderTopRightRadius: "24px", 
-          marginTop: "-20px", 
-          padding: "32px 20px", 
+        <div style={{
+          background: "var(--white)",
+          borderTopLeftRadius: "24px",
+          borderTopRightRadius: "24px",
+          marginTop: "-20px",
+          padding: "32px 20px",
           flex: 1,
           display: "flex",
           flexDirection: "column",
           gap: "24px"
         }}>
-          
+
           {/* O Que É */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
@@ -103,9 +123,9 @@ export default function MedsTab({ meds, setMeds }: MedsTabProps) {
 
           {/* Alertas */}
           {selectedMed.info.alerta && (
-            <div style={{ background: "linear-gradient(135deg, #FFF3CD, #FFF9E5)", border: "2px solid var(--yellow)", borderRadius: "14px", padding: "18px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
+            <div style={{ background: "var(--yellow-light)", border: "2px solid var(--yellow)", borderRadius: "14px", padding: "18px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
               <div style={{ fontSize: "28px", flexShrink: 0 }}>💛</div>
-              <div style={{ fontSize: "14px", lineHeight: "1.6", color: "var(--gray-800)" }}>
+              <div style={{ fontSize: "14px", lineHeight: "1.6", color: "var(--gray-900)" }}>
                 {selectedMed.info.alerta}
               </div>
             </div>
@@ -115,7 +135,7 @@ export default function MedsTab({ meds, setMeds }: MedsTabProps) {
           {selectedMed.info.rodizio && (
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#fefce8", color: "var(--blue-dark)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
+                 <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--yellow-light)", color: "var(--yellow-dark)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
                   🔄
                 </div>
                 <h2 style={{ fontSize: "18px", fontFamily: "'Poppins', sans-serif", fontWeight: 700, margin: 0, color: "var(--blue-dark)" }}>
@@ -145,53 +165,57 @@ export default function MedsTab({ meds, setMeds }: MedsTabProps) {
     <>
       <div className="card" style={{ border: "none", boxShadow: "none", padding: "0 0 16px 0", background: "transparent" }}>
         <div style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: "16px", fontWeight: 800, marginBottom: "4px" }}>
-          Farmácia Digital
+          {registration?.role === "cuidador" ? `Farmacoterapia de ${registration.patientName}` : "Minha Farmacoterapia Digital"}
         </div>
         <div style={{ fontSize: "12px", color: "var(--gray-500)" }}>
-          Consulte o estoque e aprenda mais sobre o seu tratamento.
+          Aprenda mais sobre o seu tratamento.
         </div>
       </div>
 
       <div className="card">
-        <div className="card-title">💊 Meus Medicamentos</div>
+        <div className="card-title">
+          {registration?.role === "cuidador" ? `💊 Medicamentos de ${registration.patientName}` : "💊 Meus Medicamentos"}
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {meds.map((med) => (
-            <div 
-              key={med.id} 
-              className="med-item" 
-              style={{ flexDirection: "column", alignItems: "stretch", padding: "12px", border: "1px solid var(--gray-100)", transition: "all 0.2s", background: "white" }}
+            <div
+              key={med.id}
+              className="med-item"
+              style={{ flexDirection: "column", alignItems: "stretch", padding: "12px", border: "1px solid var(--gray-100)", transition: "all 0.2s", background: "var(--white)" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div className="med-icon" style={{ 
-                  background: med.info.categoria === "Injetável" ? "#E3F2FD" : "var(--gray-50)", 
-                  color: med.info.categoria === "Injetável" ? "#1E88E5" : "var(--gray-600)",
+                <div className="med-icon" style={{
+                  background: med.info.categoria === "Injetável" ? "var(--blue-pale)" : "var(--gray-100)",
+                  color: med.info.categoria === "Injetável" ? "var(--blue)" : "var(--gray-500)",
                   width: "44px", height: "44px"
                 }}>
                   {med.info.categoria === "Injetável" ? "💉" : "💊"}
                 </div>
                 <div className="med-info" style={{ flex: 1 }}>
-                  <div style={{ fontSize: "10px", fontWeight: 800, color: med.info.categoria === "Injetável" ? "#1E88E5" : "var(--gray-500)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>
+                  <div style={{ fontSize: "10px", fontWeight: 800, color: med.info.categoria === "Injetável" ? "var(--blue)" : "var(--gray-500)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>
                     {med.info.categoria}
                   </div>
                   <div className="med-name" style={{ fontSize: "14px" }}>{med.name}</div>
                   <div className="med-dose">{med.dosage}</div>
                 </div>
-                
-                {/* Botão Ver Guia fica ao lado das informações básicas */}
+
+                {/* Botão Saiba mais fica ao lado das informações básicas */}
                 <button
                   className="btn btn-primary btn-sm"
                   style={{ padding: "8px 16px", fontSize: "11px", borderRadius: "30px", flexShrink: 0 }}
                   onClick={() => setExpandedId(med.id)}
                 >
-                  📖 Ver Guia
+                  📖 Saiba mais
                 </button>
               </div>
-              
+
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "14px", paddingTop: "14px", borderTop: "1px solid var(--gray-100)" }}>
                 <div>
-                  <div style={{ fontSize: "10px", color: "var(--gray-500)", fontWeight: 700 }}>ESTOQUE NA UNIDADE</div>
+                  <div style={{ fontSize: "10px", color: "var(--gray-500)", fontWeight: 700, textTransform: "uppercase" }}>
+                    {med.info.categoria === "Injetável" ? "Doses disponíveis (injetável)" : "Doses disponíveis (comprimidos)"}
+                  </div>
                   <div style={{ fontSize: "14px", fontWeight: 800, color: med.stock > 0 ? "var(--green)" : "var(--red)" }}>
-                    {med.stock > 0 ? `${med.stock} caixas` : "Indisponível"}
+                    {getStockDescription(med)}
                   </div>
                 </div>
               </div>
