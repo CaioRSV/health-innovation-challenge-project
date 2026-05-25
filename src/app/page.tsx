@@ -5,6 +5,7 @@ import Navigation from "../components/Navigation";
 import PacienteView from "../components/PacienteView";
 import FarmaceuticoView from "../components/FarmaceuticoView";
 import GestorView from "../components/GestorView";
+import ProjetoView from "../components/ProjetoView";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("paciente");
@@ -38,6 +39,7 @@ export default function Home() {
         <FarmaceuticoView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       )}
       {activeView === "gestor" && <GestorView />}
+      {activeView === "projeto" && <ProjetoView />}
     </>
   );
 }

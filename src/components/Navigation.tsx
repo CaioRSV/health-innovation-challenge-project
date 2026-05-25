@@ -47,6 +47,12 @@ export default function Navigation({ activeView, setActiveView }: NavigationProp
         >
           🏛 Gestor
         </button>
+        <button
+          className={`user-tab ${activeView === "projeto" ? "active" : ""}`}
+          onClick={() => setActiveView("projeto")}
+        >
+          💡 Projeto
+        </button>
       </div>
     </nav>
   );

@@ -6,10 +6,15 @@ const MOCK_PACIENTES = [
   { id: 3, nome: "Carlos Santos", cpf: "999.000.111-22", status: "Ativo", medicamento: "Etanercepte", risco: "Baixo" },
 ];
 
-const MOCK_FARMACEUTICOS = [
+const INITIAL_FARMACEUTICOS = [
   { id: 1, nome: "Dra. Ana Costa", crf: "1234/PE", farmacia: "Farmácia Central", avaliacao: "4.9/5", pacientes: 124 },
   { id: 2, nome: "Dr. Pedro Alves", crf: "5678/PE", farmacia: "Farmácia Zona Sul", avaliacao: "4.7/5", pacientes: 89 },
   { id: 3, nome: "Dra. Júlia Lima", crf: "9012/PE", farmacia: "Farmácia Metropolitana", avaliacao: "4.8/5", pacientes: 156 },
+];
+
+const INITIAL_CANDIDATOS = [
+  { id: 101, nome: "Dr. Marcos Silva", crf: "1122/PE", farmacia: "Farmácia São João", formacao: "UFPE - Especialista em Farmácia Clínica", status: "Pendente" },
+  { id: 102, nome: "Dra. Sofia Mendes", crf: "3344/PE", farmacia: "Farmácia Vida", formacao: "UPE - Mestrado em Saúde Pública", status: "Pendente" },
 ];
 
 export default function GestorView() {
@@ -17,11 +22,30 @@ export default function GestorView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPerson, setSelectedPerson] = useState<{ type: "paciente" | "farmaceutico", data: any } | null>(null);
 
+  const [farmaceuticos, setFarmaceuticos] = useState(INITIAL_FARMACEUTICOS);
+  const [candidatos, setCandidatos] = useState(INITIAL_CANDIDATOS);
+
+  const handleApprove = (candidato: any) => {
+    setCandidatos(prev => prev.filter(c => c.id !== candidato.id));
+    setFarmaceuticos(prev => [...prev, {
+      id: candidato.id,
+      nome: candidato.nome,
+      crf: candidato.crf,
+      farmacia: candidato.farmacia,
+      avaliacao: "Novo",
+      pacientes: 0
+    }]);
+  };
+
+  const handleReject = (id: number) => {
+    setCandidatos(prev => prev.filter(c => c.id !== id));
+  };
+
   const filteredPacientes = MOCK_PACIENTES.filter(p =>
     p.nome.toLowerCase().includes(searchQuery.toLowerCase()) || p.cpf.includes(searchQuery)
   );
 
-  const filteredFarmaceuticos = MOCK_FARMACEUTICOS.filter(f =>
+  const filteredFarmaceuticos = farmaceuticos.filter(f =>
     f.nome.toLowerCase().includes(searchQuery.toLowerCase()) || f.crf.includes(searchQuery)
   );
 
@@ -187,285 +211,35 @@ export default function GestorView() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
-          {/* Risco */}
-          <div className="panel-card" style={{ minWidth: "300px", flex: 1 }}>
-            <div className="panel-title">🔴 Matriz de Risco</div>
-            <div className="risk-row" style={{ background: "var(--red-light)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div className="risk-indicator" style={{ background: "var(--red)" }}></div>
-                <span>Clínico (teleconsulta, alertas)</span>
-              </div>
-              <div className="badge badge-red">Alto</div>
-            </div>
-            <div className="risk-row" style={{ background: "var(--red-light)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div className="risk-indicator" style={{ background: "var(--red)" }}></div>
-                <span>Dados (LGPD / privacidade)</span>
-              </div>
-              <div className="badge badge-red">Alto</div>
-            </div>
-            <div className="risk-row" style={{ background: "var(--yellow-light)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div className="risk-indicator" style={{ background: "var(--yellow-dark)" }}></div>
-                <span>Tecnológico (infraestrutura)</span>
-              </div>
-              <div className="badge badge-yellow">Médio</div>
-            </div>
-            <div className="risk-row" style={{ background: "var(--yellow-light)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div className="risk-indicator" style={{ background: "var(--yellow-dark)" }}></div>
-                <span>Uso do paciente (letramento)</span>
-              </div>
-              <div className="badge badge-yellow">Médio</div>
-            </div>
-            <div className="risk-row" style={{ background: "var(--yellow-light)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div className="risk-indicator" style={{ background: "var(--yellow-dark)" }}></div>
-                <span>Institucional (integração)</span>
-              </div>
-              <div className="badge badge-yellow">Médio</div>
-            </div>
-            <div
-              style={{
-                marginTop: "12px",
-                padding: "10px",
-                background: "var(--blue-pale)",
-                borderRadius: "8px",
-                fontSize: "11px",
-                color: "var(--blue-dark)",
-                lineHeight: 1.5,
-              }}
-            >
-              <strong>Mitigações ativas:</strong> criptografia LGPD, autenticação segura, rastreabilidade
-              de acessos e controle de permissões por perfil.
-            </div>
-          </div>
-
-          {/* Monetização / Orçamento */}
-          <div className="panel-card" style={{ minWidth: "300px", flex: 1 }}>
-            <div className="panel-title">💰 Modelo de Negócio</div>
-            <div className="feature-list">
-              <div className="feature-item">
-                <div className="feat-icon" style={{ background: "#dbeafe" }}>
-                  📜
-                </div>
+        {/* Análise de Currículos */}
+        <div style={{
+          background: "var(--white)",
+          borderRadius: "var(--radius)",
+          padding: "24px",
+          border: "1px solid var(--gray-100)",
+          boxShadow: "var(--shadow-sm)",
+        }}>
+          <div className="panel-title">📋 Análise de Novos Currículos (Farmacêuticos)</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {candidatos.length > 0 ? candidatos.map(cand => (
+              <div key={cand.id} style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "16px", background: "var(--gray-50)", borderRadius: "8px", border: "1px solid var(--gray-100)",
+                flexWrap: "wrap", gap: "16px"
+              }}>
                 <div>
-                  <div className="feat-title">Licitação por Inexigibilidade</div>
-                  <div className="feat-desc">Solução exclusiva para o SUS-PE. Contratação direta com a Secretaria de Saúde.</div>
+                  <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--gray-800)" }}>{cand.nome}</div>
+                  <div style={{ fontSize: "12px", color: "var(--gray-500)", marginBottom: "4px" }}>CRF: {cand.crf} | {cand.farmacia}</div>
+                  <div style={{ fontSize: "13px", color: "var(--gray-700)" }}>🎓 {cand.formacao}</div>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button className="btn btn-outline" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => handleReject(cand.id)}>Rejeitar</button>
+                  <button className="btn btn-primary" style={{ background: "var(--green)", borderColor: "var(--green)" }} onClick={() => handleApprove(cand)}>Aprovar</button>
                 </div>
               </div>
-              <div className="feature-item">
-                <div className="feat-icon" style={{ background: "#fef3c7" }}>
-                  🏥
-                </div>
-                <div>
-                  <div className="feat-title">Menos internações</div>
-                  <div className="feat-desc">Maior adesão → menos complicações clínicas → menos custos hospitalares.</div>
-                </div>
-              </div>
-            </div>
-            <div style={{ marginTop: "14px" }}>
-              <div className="section-label">Orçamento estimado</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "6px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "12px",
-                    padding: "8px 12px",
-                    background: "var(--gray-50)",
-                    borderRadius: "8px",
-                    border: "1px solid var(--gray-100)",
-                  }}
-                >
-                  <span style={{ fontWeight: 700 }}>App + Web</span>
-                  <span style={{ color: "var(--blue)", fontWeight: 800 }}>R$ 300k – 600k</span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "12px",
-                    padding: "8px 12px",
-                    background: "var(--gray-50)",
-                    borderRadius: "8px",
-                    border: "1px solid var(--gray-100)",
-                  }}
-                >
-                  <span style={{ fontWeight: 700 }}>Integração sistemas</span>
-                  <span style={{ color: "var(--blue)", fontWeight: 800 }}>R$ 100k – 300k</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Backlog status */}
-          <div className="panel-card" style={{ minWidth: "300px", flex: 1 }}>
-            <div className="panel-title">📋 Status do Backlog</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span>🔴 Must Have (MVP)</span>
-                  <span style={{ color: "var(--green)" }}>7/9</span>
-                </div>
-                <div className="progress-bar">
-                  <div className="progress-fill green" style={{ width: "78%" }}></div>
-                </div>
-              </div>
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span>🔵 Should Have</span>
-                  <span style={{ color: "var(--blue)" }}>3/6</span>
-                </div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: "50%" }}></div>
-                </div>
-              </div>
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span>🟢 Could Have</span>
-                  <span style={{ color: "var(--gray-500)" }}>1/5</span>
-                </div>
-                <div className="progress-bar">
-                  <div className="progress-fill yellow" style={{ width: "20%" }}></div>
-                </div>
-              </div>
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span>🟣 Won't Have (v1)</span>
-                  <span style={{ color: "var(--gray-300)" }}>—</span>
-                </div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: "0%" }}></div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: "16px" }}>
-              <div className="section-label">Won't have — v1</div>
-              <div className="chip-row" style={{ marginTop: "8px" }}>
-                <div className="chip" style={{ background: "#fce7f3", color: "#9d174d" }}>
-                  IA Avançada
-                </div>
-                <div className="chip" style={{ background: "#fce7f3", color: "#9d174d" }}>
-                  Big Data
-                </div>
-                <div className="chip" style={{ background: "#fce7f3", color: "#9d174d" }}>
-                  Integração Nacional
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Swimlane description */}
-        <div className="panel-card">
-          <div className="panel-title">🔄 Fluxo TO-BE — Cuidado não termina na dispensação</div>
-          <div style={{ display: "flex", gap: "0", overflowX: "auto", paddingBottom: "8px" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--blue-pale)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--blue)" }}>👤</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Cadastro</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Integrado ao sistema estadual</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--green-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--green)" }}>🧑‍⚕️</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>1ª Consulta</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Farmacêutico + paciente</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--yellow-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--yellow-dark)" }}>💊</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Dispensação</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Mensal CEAF</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--red-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--red)" }}>📱</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Monitoramento</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Lembretes + adesão</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--blue-pale)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--blue)" }}>🚨</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Alertas</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Intervenção precoce</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--blue-pale)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--blue)" }}>📖</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Educação</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Guia do medicamento</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", color: "var(--gray-300)", fontSize: "20px" }}>→</div>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "120px", padding: "0 12px" }}>
-              <div style={{ width: "44px", height: "44px", background: "var(--green-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", border: "2px solid var(--green)" }}>🎥</div>
-              <div style={{ textAlign: "center", fontSize: "11px", fontWeight: 700, color: "var(--gray-700)" }}>Teleconsulta</div>
-              <div style={{ textAlign: "center", fontSize: "10px", color: "var(--gray-500)" }}>Seguimento contínuo</div>
-            </div>
-          </div>
-          <div
-            style={{
-              marginTop: "16px",
-              padding: "12px 16px",
-              background: "linear-gradient(135deg, var(--blue-pale), var(--green-light))",
-              borderRadius: "10px",
-              border: "1px solid var(--blue-light)",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'Sora', sans-serif",
-                fontSize: "13px",
-                fontWeight: 700,
-                color: "var(--blue-dark)",
-              }}
-            >
-              ⭐ Diferencial:
-            </span>
-            <span style={{ fontSize: "12px", color: "var(--gray-700)" }}>
-              {" "}
-              O cuidado não termina na dispensação. A plataforma integra <strong>dispensação + acompanhamento clínico + educação em saúde</strong> em um único ecossistema.
-            </span>
+            )) : (
+              <div style={{ textAlign: "center", color: "var(--gray-500)", padding: "20px", fontSize: "14px" }}>Nenhum currículo pendente para análise.</div>
+            )}
           </div>
         </div>
       </div>
