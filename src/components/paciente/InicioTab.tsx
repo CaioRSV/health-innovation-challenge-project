@@ -1,16 +1,18 @@
 import React, { useState } from "react";
-import { Medicine } from "../../types";
-import { RegistrationData } from "../PacienteView";
+import { useAppStore } from "../../store/AppStore";
 
 interface InicioTabProps {
-  meds: Medicine[];
-  medsDone: Record<string, boolean>;
-  setMedsDone: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   onNavigate?: (tab: string) => void;
-  registration?: RegistrationData | null;
 }
 
-export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate, registration }: InicioTabProps) {
+export default function InicioTab({ onNavigate }: InicioTabProps) {
+  const { 
+    pacienteProfile: registration, 
+    meds, 
+    medsDone, 
+    setMedsDone 
+  } = useAppStore();
+
   const dailyMeds = meds.filter((m) => m.isDaily);
 
   const toggleMed = (id: string) => {
@@ -52,7 +54,7 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate, reg
       {/* Adesão hoje */}
       <div className="card">
         <div className="card-title">
-          {registration?.role === "cuidador" ? "📊 Administrado hoje" : "📊 Tomei hoje"}
+          📊 Tomei hoje
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
           <div
@@ -70,7 +72,7 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate, reg
               <div className={`progress-fill ${progressColorClass}`} style={{ width: `${percentage}%` }}></div>
             </div>
             <div style={{ fontSize: "10px", color: "var(--gray-500)", marginTop: "4px" }}>
-              {takenMeds} de {totalMeds} {registration?.role === "cuidador" ? "administrados" : "tomados"}
+              {takenMeds} de {totalMeds} tomados
             </div>
           </div>
         </div>
@@ -78,17 +80,15 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate, reg
           <div className="alert-strip info">Nenhum medicamento diário cadastrado</div>
         ) : missingMeds === 0 ? (
           <div className="alert-strip success">
-            {registration?.role === "cuidador" ? "✅ Todos os medicamentos administrados!" : "✅ Todos os medicamentos tomados hoje!"}
+            ✅ Todos os medicamentos tomados hoje!
           </div>
         ) : missingMeds === 1 ? (
           <div className="alert-strip warning">
-            {registration?.role === "cuidador" ? "⏰ Falta administrar 1 medicamento" : "⏰ Falta 1 medicamento do dia"}
+            ⏰ Falta 1 medicamento do dia
           </div>
         ) : (
           <div className="alert-strip danger">
-            {registration?.role === "cuidador"
-              ? `⏰ Faltam administrar ${missingMeds} medicamentos`
-              : `⏰ Faltam ${missingMeds} medicamentos do dia`}
+            ⏰ Faltam {missingMeds} medicamentos do dia
           </div>
         )}
       </div>
@@ -120,33 +120,12 @@ export default function InicioTab({ meds, medsDone, setMedsDone, onNavigate, reg
                     <div className="med-name">{med.name}</div>
                     <div className="med-dose">{med.dosage} · {med.info.categoria}</div>
                   </div>
-                  {registration?.role === "cuidador" ? (
-                    <button
-                      onClick={() => toggleMed(med.id)}
-                      style={{
-                        padding: "6px 12px",
-                        borderRadius: "20px",
-                        border: "none",
-                        background: isDone ? "var(--green)" : "var(--blue)",
-                        color: "white",
-                        fontSize: "11px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                        transition: "all 0.2s"
-                      }}
-                    >
-                      {isDone ? "✓ Administrado" : "Confirmar tomada"}
-                    </button>
-                  ) : (
-                    <div
-                      className={`med-check ${isDone ? "done" : ""}`}
-                      onClick={() => toggleMed(med.id)}
-                    >
-                      {isDone ? "✓" : "○"}
-                    </div>
-                  )}
+                  <div
+                    className={`med-check ${isDone ? "done" : ""}`}
+                    onClick={() => toggleMed(med.id)}
+                  >
+                    {isDone ? "✓" : "○"}
+                  </div>
                 </div>
               );
             })}

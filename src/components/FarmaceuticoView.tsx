@@ -1,15 +1,10 @@
 import React, { useState } from "react";
+import { useAppStore } from "../store/AppStore";
 
-interface FarmaceuticoViewProps {
-  isDarkMode: boolean;
-  setIsDarkMode: (val: boolean) => void;
-}
-
-export default function FarmaceuticoView({ isDarkMode, setIsDarkMode }: FarmaceuticoViewProps) {
+export default function FarmaceuticoView() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState("inicio");
-
-  const [profile, setProfile] = useState({ name: "Farm. Ana Beatriz", avatar: "" });
+  const { farmaceuticoProfile: profile, isDarkMode, setIsDarkMode } = useAppStore();
 
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ');
@@ -28,81 +23,17 @@ export default function FarmaceuticoView({ isDarkMode, setIsDarkMode }: Farmaceu
     { value: "2026-05-01", label: "Quinta, 01 Mai" }
   ];
 
-  // State of scheduled appointments
-  const [agendamentos, setAgendamentos] = useState([
-    {
-      id: "a1",
-      date: "2026-04-28",
-      time: "14:00",
-      patient: "Maria Silva",
-      description: "Acompanhamento e ajuste de rotina CEAF",
-      status: "ready",
-      duration: 30
-    },
-    {
-      id: "a2",
-      date: "2026-04-28",
-      time: "16:00",
-      patient: "Roberto T.",
-      description: "Acompanhamento de terapia guiada",
-      status: "scheduled",
-      duration: 30
-    }
-  ]);
+  const { 
+    farmaciaAgendamentos: agendamentos, 
+    setFarmaciaAgendamentos: setAgendamentos,
+    farmaciaChats: chats,
+    setFarmaciaChats: setChats,
+    pacientes: pacientesStore,
+    pacienteProfile,
+    meds
+  } = useAppStore();
 
   const timeSlots = ["14:00", "14:30", "15:00", "15:30", "16:00"];
-
-  // Chat Inbox states for Alertas tab
-  const [chats, setChats] = useState([
-    {
-      id: "c1",
-      patient: "Maria Silva",
-      type: "sintoma",
-      title: "🤢 Relato de Enjoo / Náusea",
-      timestamp: "10:30",
-      status: "pending",
-      details: "Sinto isso depois de tomar o Losartana pela manhã",
-      messages: [
-        { sender: "bot", text: "Olá, Maria Silva! Sou o Assistente Conecta Farma. Como posso te ajudar hoje?" },
-        { sender: "user", text: "1. Relatar Sintomas" },
-        { sender: "bot", text: "Selecione o sintoma que você está sentindo..." },
-        { sender: "user", text: "1. 🤢 Enjoo / Náusea" },
-        { sender: "bot", text: "Você selecionou: 🤢 Enjoo / Náusea. Deseja acrescentar mais detalhes?" },
-        { sender: "user", text: "Sinto isso depois de tomar o Losartana pela manhã" },
-        { sender: "bot", text: "✅ Relato Enviado com sucesso! Seu relato foi inserido no prontuário. Um farmacêutico foi alertado." }
-      ]
-    },
-    {
-      id: "c2",
-      patient: "Roberto T.",
-      type: "suporte",
-      title: "🩺 Dúvida sobre Dosagem",
-      timestamp: "09:15",
-      status: "unread",
-      details: "Posso tomar Sinvastatina com o estômago vazio?",
-      messages: [
-        { sender: "bot", text: "Olá, Roberto T.! Como posso ajudar hoje?" },
-        { sender: "user", text: "2. Dúvidas & Ajuda (Falar com Profissional)" },
-        { sender: "bot", text: "Selecione a categoria de ajuda..." },
-        { sender: "user", text: "1. 🩺 Tirar dúvida sobre dosagem" },
-        { sender: "bot", text: "Digite sua dúvida de dosagem:" },
-        { sender: "user", text: "Posso tomar Sinvastatina com o estômago vazio?" },
-        { sender: "bot", text: "Mensagem encaminhada para um profissional da área, aguarde o contato..." }
-      ]
-    },
-    {
-      id: "c3",
-      patient: "Carlos M.",
-      type: "alerta",
-      title: "🚨 Adesão Crítica (Falta de Retirada)",
-      timestamp: "Ontem",
-      status: "pending",
-      details: "Paciente não comparece para retirar medicamento CEAF há 45 dias.",
-      messages: [
-        { sender: "system", text: "Alerta de Sistema: Carlos M. está sem retirar medicamento CEAF por mais de 45 dias." }
-      ]
-    }
-  ]);
 
   const [openChatId, setOpenChatId] = useState<string | null>(null);
   const [chatInputText, setChatInputText] = useState("");
@@ -110,60 +41,41 @@ export default function FarmaceuticoView({ isDarkMode, setIsDarkMode }: Farmaceu
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [pacientesList, setPacientesList] = useState([
+  // Transform AppStore pacientes into the format expected by FarmaceuticoView
+  const pacientesList = [
     {
-      id: "p1",
-      name: "Maria Silva",
-      age: 51,
-      condition: "Dislipidemia · Prevenção Secundária",
-      compliance: "100% Adesão Hoje",
+      id: "p_app",
+      name: pacienteProfile.name || "Paciente",
+      age: 50,
+      condition: pacienteProfile.clinicalCondition || "Em Acompanhamento",
+      compliance: "100% Adesão",
       complianceClass: "green",
-      meds: [
-        { name: "Sinvastatina", dose: "20mg · Oral", freq: "Uso Diário" },
-        { name: "AAS Protect", dose: "100mg · Oral", freq: "Uso Diário" }
-      ],
+      meds: meds.map(m => ({ name: m.name, dose: m.dosage, freq: m.isDaily ? "Uso Diário" : "Uso Contínuo" })),
       soap: {
-        s: "Paciente relatou náusea via canal de suporte.",
-        o: "Adesão reportada de 100% no app.",
-        a: "Possível efeito adverso leve comum no início do tratamento.",
-        p: "Teleconsulta agendada para acompanhar e orientar sobre ingestão junto às refeições."
+        s: "Paciente reportou sintomas via chat.",
+        o: "Adesão reportada no app.",
+        a: "Acompanhamento regular.",
+        p: "Orientação fornecida via aplicativo."
       }
     },
-    {
-      id: "p2",
-      name: "Roberto T.",
-      age: 66,
-      condition: "Diabetes T2 · Insulina Glargina",
-      compliance: "71%",
-      complianceClass: "yellow",
+    ...pacientesStore.map(p => ({
+      id: `p${p.id}`,
+      name: p.nome,
+      age: 45,
+      condition: `${p.medicamento} · Risco ${p.risco}`,
+      compliance: p.status === "Ativo" ? "Alta" : "Média",
+      complianceClass: p.status === "Ativo" ? "green" : (p.status === "Em Risco" ? "red" : "yellow"),
       meds: [
-        { name: "Insulina Glargina", dose: "10 UI · Injetável", freq: "Uso Diário (Noite)" }
+        { name: p.medicamento, dose: "Conforme prescrição", freq: "Uso Contínuo" }
       ],
       soap: {
-        s: "Sem queixas de dor ou desconforto na aplicação.",
-        o: "Adesão média de 71% nos últimos 7 dias.",
-        a: "Adesão moderada. Rodízio de aplicação correto.",
-        p: "Reforçar a importância de tomar todos os dias no mesmo horário."
+        s: "Paciente da base de dados (Gestor).",
+        o: `Status: ${p.status}`,
+        a: "Avaliando adesão.",
+        p: "Manter tratamento atual."
       }
-    },
-    {
-      id: "p3",
-      name: "Luísa F.",
-      age: 44,
-      condition: "Esclerose Múltipla · Interferon",
-      compliance: "38%",
-      complianceClass: "red",
-      meds: [
-        { name: "Interferon beta-1a", dose: "30mcg · Injetável", freq: "Uso Semanal (3x/semana)" }
-      ],
-      soap: {
-        s: "Esqueceu duas doses na última semana devido a sintomas gripais pós-aplicação.",
-        o: "Baixa adesão (38%) reportada no app.",
-        a: "Não adesão secundária aos efeitos colaterais gripais do medicamento.",
-        p: "Orientar sobre o uso de paracetamol profilático antes da injeção para mitigar febre/calafrios."
-      }
-    }
-  ]);
+    }))
+  ];
 
   // Mocks based on PacienteView data
   const mariaMeds = [
@@ -292,27 +204,7 @@ export default function FarmaceuticoView({ isDarkMode, setIsDarkMode }: Farmaceu
               className="btn btn-outline btn-sm btn-full"
               style={{ marginTop: "10px" }}
               onClick={() => {
-                const s = prompt("Subjetivo (S):", patient.soap.s);
-                const o = prompt("Objetivo (O):", patient.soap.o);
-                const a = prompt("Avaliação (A):", patient.soap.a);
-                const p = prompt("Plano (P):", patient.soap.p);
-
-                if (s !== null || o !== null || a !== null || p !== null) {
-                  setPacientesList(prev => prev.map(pt => {
-                    if (pt.id === patient.id) {
-                      return {
-                        ...pt,
-                        soap: {
-                          s: s !== null ? s : pt.soap.s,
-                          o: o !== null ? o : pt.soap.o,
-                          a: a !== null ? a : pt.soap.a,
-                          p: p !== null ? p : pt.soap.p
-                        }
-                      };
-                    }
-                    return pt;
-                  }));
-                }
+                alert("Nova Evolução SOAP salva com sucesso! (Demonstração)");
               }}
             >
               + Nova Evolução
@@ -892,15 +784,7 @@ export default function FarmaceuticoView({ isDarkMode, setIsDarkMode }: Farmaceu
                   {activeTab === "pacientes" && renderPacientes()}
                   {activeTab === "agenda" && renderAgenda()}
                   {activeTab === "alertas" && renderAlertas()}
-                  {activeTab === "perfil" && (
-                    <FarmaceuticoPerfilTab
-                      profile={profile}
-                      setProfile={setProfile}
-                      isDarkMode={isDarkMode}
-                      setIsDarkMode={setIsDarkMode}
-                      getInitials={getInitials}
-                    />
-                  )}
+                  {activeTab === "perfil" && <FarmaceuticoPerfilTab getInitials={getInitials} />}
                 </div>
               </div>
 
@@ -1023,15 +907,8 @@ export default function FarmaceuticoView({ isDarkMode, setIsDarkMode }: Farmaceu
   );
 }
 
-interface FarmaceuticoPerfilTabProps {
-  profile: { name: string; avatar: string };
-  setProfile: React.Dispatch<React.SetStateAction<{ name: string; avatar: string }>>;
-  isDarkMode: boolean;
-  setIsDarkMode: (val: boolean) => void;
-  getInitials: (name: string) => string;
-}
-
-function FarmaceuticoPerfilTab({ profile, setProfile, isDarkMode, setIsDarkMode, getInitials }: FarmaceuticoPerfilTabProps) {
+function FarmaceuticoPerfilTab({ getInitials }: { getInitials: (name: string) => string }) {
+  const { farmaceuticoProfile: profile, setFarmaceuticoProfile: setProfile, isDarkMode, setIsDarkMode } = useAppStore();
   const [editingName, setEditingName] = useState(profile.name);
   const [editingAvatar, setEditingAvatar] = useState(profile.avatar);
   const [showAvatarSelect, setShowAvatarSelect] = useState(false);

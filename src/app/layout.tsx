@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "Plataforma do Farmacêutico e Paciente do PE",
 };
 
+import { AppStoreProvider } from "@/store/AppStore";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,7 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${nunito.variable} ${sora.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AppStoreProvider>
+          {children}
+        </AppStoreProvider>
+      </body>
     </html>
   );
 }

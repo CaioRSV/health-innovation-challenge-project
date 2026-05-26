@@ -1,23 +1,6 @@
 import React, { useState } from "react";
 import { Medicine } from "../../types";
-import { RegistrationData } from "../PacienteView";
-
-interface UserProfile {
-  name: string;
-  avatar: string;
-}
-
-interface PerfilTabProps {
-  profile: UserProfile;
-  setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
-  meds: Medicine[];
-  setMeds: React.Dispatch<React.SetStateAction<Medicine[]>>;
-  setMedsDone: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  isDarkMode: boolean;
-  setIsDarkMode: (val: boolean) => void;
-  registration?: RegistrationData | null;
-  onReset?: () => void;
-}
+import { useAppStore } from "../../store/AppStore";
 
 const availableAvatars = [
   "👩🏽‍🦱", "👩🏼‍🦳", "👨🏻", "👨🏿‍🦲", "🧑🏽", "👧🏻", "👦🏾", "👵🏼", "🧔🏻‍♂️", "🧕🏽", 
@@ -74,7 +57,16 @@ const predeterminedMeds: Medicine[] = [
   }
 ];
 
-export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsDone, isDarkMode, setIsDarkMode, registration, onReset }: PerfilTabProps) {
+export default function PerfilTab({ onReset }: { onReset: () => void }) {
+  const { 
+    pacienteProfile: profile, 
+    setPacienteProfile: setProfile,
+    meds, setMeds,
+    setMedsDone,
+    hasCompletedRegistration,
+    isDarkMode, setIsDarkMode
+  } = useAppStore();
+
   const [editingName, setEditingName] = useState(profile.name);
   const [editingAvatar, setEditingAvatar] = useState(profile.avatar);
   const [showAvatarSelect, setShowAvatarSelect] = useState(false);
@@ -216,40 +208,26 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
       </div>
 
       {/* SEÇÃO 1.2: DADOS CLÍNICOS (Apenas se cadastrado) */}
-      {registration && (
+      {hasCompletedRegistration && (
         <div className="card">
           <div className="card-title">📋 Informações Clínicas</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px", fontSize: "13px", color: "var(--gray-700)" }}>
             <div>
-              <strong>Modo de Uso:</strong> {registration.role === "cuidador" ? "Cuidador / Responsável" : "Paciente"}
+              <strong>Paciente:</strong> {profile.name} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {profile.dob})</span>
             </div>
-            {registration.role === "cuidador" ? (
-              <>
-                <div>
-                  <strong>Cuidador:</strong> {registration.userName} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {registration.userDob})</span>
-                </div>
-                <div>
-                  <strong>Paciente:</strong> {registration.patientName} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {registration.patientDob})</span>
-                </div>
-              </>
-            ) : (
-              <div>
-                <strong>Paciente:</strong> {registration.userName} <span style={{ color: "var(--gray-500)", fontSize: "11px" }}>(Nasc. {registration.userDob})</span>
-              </div>
-            )}
             <div style={{ borderTop: "1px dashed var(--gray-100)", paddingTop: "8px", marginTop: "4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               <div>
                 <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--gray-500)", display: "block" }}>ALTURA DO PACIENTE</span>
-                <strong>{registration.height} cm</strong>
+                <strong>{profile.height} cm</strong>
               </div>
               <div>
                 <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--gray-500)", display: "block" }}>PESO DO PACIENTE</span>
-                <strong>{registration.weight} kg</strong>
+                <strong>{profile.weight} kg</strong>
               </div>
             </div>
             <div style={{ borderTop: "1px dashed var(--gray-100)", paddingTop: "8px" }}>
               <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--gray-500)", display: "block" }}>CONDIÇÃO CLÍNICA</span>
-              <strong>{registration.clinicalCondition}</strong>
+              <strong>{profile.clinicalCondition}</strong>
             </div>
           </div>
         </div>
@@ -282,15 +260,13 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
       {/* SEÇÃO 2: MEDICAMENTOS */}
       <div className="card">
         <div className="card-title" style={{ justifyContent: "space-between", display: "flex" }}>
-          <span>{registration?.role === "cuidador" ? `💊 Medicamentos de ${registration.patientName}` : "💊 Meus Medicamentos"}</span>
+          <span>💊 Meus Medicamentos</span>
           <button className="btn btn-yellow btn-sm" onClick={() => setShowAddMed(!showAddMed)}>
             {showAddMed ? "Cancelar" : "+ Adicionar"}
           </button>
         </div>
         <div style={{ fontSize: "11px", color: "var(--gray-500)", marginBottom: "16px", lineHeight: "1.4" }}>
-          {registration?.role === "cuidador"
-            ? `Gerencie o tratamento de ${registration.patientName}. Medicamentos marcados como "Uso Diário" aparecem no checklist diário na aba Início.`
-            : "Gerencie seu tratamento. Medicamentos marcados como \"Uso Diário\" aparecem no seu checklist diário na aba Início."}
+          Gerencie seu tratamento. Medicamentos marcados como "Uso Diário" aparecem no seu checklist diário na aba Início.
         </div>
 
         {/* Modal/Lista para Adicionar Novos Medicamentos */}
@@ -376,7 +352,7 @@ export default function PerfilTab({ profile, setProfile, meds, setMeds, setMedsD
       </div>
 
       {/* SEÇÃO 3: REINICIAR */}
-      {onReset && registration && (
+      {hasCompletedRegistration && (
         <div style={{ marginTop: "8px", paddingBottom: "16px" }}>
           <button 
             className="btn btn-full"

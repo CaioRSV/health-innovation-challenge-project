@@ -1,29 +1,12 @@
 import React, { useState } from "react";
-
-const MOCK_PACIENTES = [
-  { id: 1, nome: "João Silva", cpf: "111.222.333-44", status: "Ativo", medicamento: "Adalimumabe", risco: "Alto" },
-  { id: 2, nome: "Maria Oliveira", cpf: "555.666.777-88", status: "Em Risco", medicamento: "Infliximabe", risco: "Médio" },
-  { id: 3, nome: "Carlos Santos", cpf: "999.000.111-22", status: "Ativo", medicamento: "Etanercepte", risco: "Baixo" },
-];
-
-const INITIAL_FARMACEUTICOS = [
-  { id: 1, nome: "Dra. Ana Costa", crf: "1234/PE", farmacia: "Farmácia Central", avaliacao: "4.9/5", pacientes: 124 },
-  { id: 2, nome: "Dr. Pedro Alves", crf: "5678/PE", farmacia: "Farmácia Zona Sul", avaliacao: "4.7/5", pacientes: 89 },
-  { id: 3, nome: "Dra. Júlia Lima", crf: "9012/PE", farmacia: "Farmácia Metropolitana", avaliacao: "4.8/5", pacientes: 156 },
-];
-
-const INITIAL_CANDIDATOS = [
-  { id: 101, nome: "Dr. Marcos Silva", crf: "1122/PE", farmacia: "Farmácia São João", formacao: "UFPE - Especialista em Farmácia Clínica", status: "Pendente" },
-  { id: 102, nome: "Dra. Sofia Mendes", crf: "3344/PE", farmacia: "Farmácia Vida", formacao: "UPE - Mestrado em Saúde Pública", status: "Pendente" },
-];
+import { useAppStore } from "../store/AppStore";
 
 export default function GestorView() {
+  const { pacientes, farmaceuticosAtivos: farmaceuticos, setFarmaceuticosAtivos: setFarmaceuticos, candidatos, setCandidatos } = useAppStore();
+
   const [searchType, setSearchType] = useState<"paciente" | "farmaceutico">("paciente");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPerson, setSelectedPerson] = useState<{ type: "paciente" | "farmaceutico", data: any } | null>(null);
-
-  const [farmaceuticos, setFarmaceuticos] = useState(INITIAL_FARMACEUTICOS);
-  const [candidatos, setCandidatos] = useState(INITIAL_CANDIDATOS);
 
   const handleApprove = (candidato: any) => {
     setCandidatos(prev => prev.filter(c => c.id !== candidato.id));
@@ -41,7 +24,7 @@ export default function GestorView() {
     setCandidatos(prev => prev.filter(c => c.id !== id));
   };
 
-  const filteredPacientes = MOCK_PACIENTES.filter(p =>
+  const filteredPacientes = pacientes.filter(p =>
     p.nome.toLowerCase().includes(searchQuery.toLowerCase()) || p.cpf.includes(searchQuery)
   );
 

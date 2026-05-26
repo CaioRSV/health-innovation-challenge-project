@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import { Medicine } from "../../types";
-import { RegistrationData } from "../PacienteView";
+import { useAppStore } from "../../store/AppStore";
 
-interface MedsTabProps {
-  meds: Medicine[];
-  setMeds: React.Dispatch<React.SetStateAction<Medicine[]>>;
-  registration?: RegistrationData | null;
-}
-
-export default function MedsTab({ meds, setMeds, registration }: MedsTabProps) {
+export default function MedsTab() {
+  const { meds, setMeds, medsDone, setMedsDone } = useAppStore();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const getStockDescription = (med: Medicine) => {
@@ -165,7 +160,7 @@ export default function MedsTab({ meds, setMeds, registration }: MedsTabProps) {
     <>
       <div className="card" style={{ border: "none", boxShadow: "none", padding: "0 0 16px 0", background: "transparent" }}>
         <div style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: "16px", fontWeight: 800, marginBottom: "4px" }}>
-          {registration?.role === "cuidador" ? `Farmacoterapia de ${registration.patientName}` : "Minha Farmacoterapia Digital"}
+          Minha Farmacoterapia Digital
         </div>
         <div style={{ fontSize: "12px", color: "var(--gray-500)" }}>
           Aprenda mais sobre o seu tratamento.
@@ -174,7 +169,7 @@ export default function MedsTab({ meds, setMeds, registration }: MedsTabProps) {
 
       <div className="card">
         <div className="card-title">
-          {registration?.role === "cuidador" ? `💊 Medicamentos de ${registration.patientName}` : "💊 Meus Medicamentos"}
+          💊 Meus Medicamentos
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {meds.map((med) => (
@@ -218,6 +213,27 @@ export default function MedsTab({ meds, setMeds, registration }: MedsTabProps) {
                     {getStockDescription(med)}
                   </div>
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="card">
+        <div className="card-title">📦 Histórico de Retiradas</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px" }}>
+          {meds.map((med) => (
+            <div key={med.id} className="history-item">
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "12px", fontWeight: "bold", color: "var(--gray-900)" }}>{med.name}</div>
+                <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>
+                  Retirado em: 10 Abr 2026<br />
+                  Local: Farmácia Metropolitana
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: "12px", fontWeight: "bold", color: "var(--green)" }}>Em dia</div>
+                <div style={{ fontSize: "10px", color: "var(--gray-500)" }}>Próxima: 10 Mai</div>
               </div>
             </div>
           ))}

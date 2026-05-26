@@ -7,11 +7,7 @@ import GuiaTab from "./paciente/GuiaTab";
 import ChatTab from "./paciente/ChatTab";
 import PerfilTab from "./paciente/PerfilTab";
 import { Medicine } from "../types";
-
-export interface UserProfile {
-  name: string;
-  avatar: string;
-}
+import { useAppStore } from "../store/AppStore";
 
 export interface RegistrationData {
   role: "paciente" | "cuidador";
@@ -23,11 +19,6 @@ export interface RegistrationData {
   weight: string;
   clinicalCondition: string;
   meds: { name: string; dosage: string; via: "Oral" | "Injetável" | "Insumo"; time: string }[];
-}
-
-interface PacienteViewProps {
-  isDarkMode: boolean;
-  setIsDarkMode: (val: boolean) => void;
 }
 
 interface CadastroScreenProps {
@@ -315,65 +306,32 @@ function CadastroScreen({ onComplete }: CadastroScreenProps) {
   );
 }
 
-export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteViewProps) {
+export default function PacienteView() {
   const [activeTab, setActiveTab] = useState("inicio");
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Registration & Profile data
-  const [registration, setRegistration] = useState<RegistrationData | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>({ name: "Paciente", avatar: "" });
-  
-  // Meds list initialized empty, then filled after registration
-  const [meds, setMeds] = useState<Medicine[]>([]);
-  const [medsDone, setMedsDone] = useState<Record<string, boolean>>({});
-
-  // Sync state from localStorage after mounting
-  useEffect(() => {
-    const saved = localStorage.getItem("registration");
-    if (saved) {
-      try {
-        const parsed: RegistrationData = JSON.parse(saved);
-        setRegistration(parsed);
-        setProfile({ name: parsed.role === "paciente" ? parsed.userName : parsed.userName, avatar: "" });
-
-        // Convert the starting meds list into the format used by MedsTab
-        const parsedMeds: Medicine[] = parsed.meds.map((m, idx) => ({
-          id: `m_${idx}_${Date.now()}`,
-          name: m.name,
-          dosage: m.dosage,
-          stock: m.via === "Injetável" ? 10 : 30, // Starting stock
-          reserved: false,
-          isDaily: true,
-          info: {
-            categoria: m.via,
-            descricao: `Medicamento de uso diário cadastrado no início do tratamento.`,
-            detalhes: [
-              { label: "Horário", value: m.time },
-              { label: "Via", value: m.via }
-            ]
-          }
-        }));
-
-        setMeds(parsedMeds);
-        
-        const initialDone: Record<string, boolean> = {};
-        parsedMeds.forEach(m => {
-          initialDone[m.id] = false;
-        });
-        setMedsDone(initialDone);
-
-      } catch (e) {
-        console.error("Erro ao ler cadastro do localStorage", e);
-      }
-    }
-    setIsLoaded(true);
-  }, []);
+  const {
+    pacienteProfile,
+    setPacienteProfile,
+    meds,
+    setMeds,
+    medsDone,
+    setMedsDone,
+    hasCompletedRegistration,
+    setHasCompletedRegistration,
+    isDarkMode,
+    setIsDarkMode
+  } = useAppStore();
 
   const handleCadastroComplete = (data: RegistrationData) => {
-    setRegistration(data);
-    localStorage.setItem("registration", JSON.stringify(data));
-    setProfile({ name: data.role === "paciente" ? data.userName : data.userName, avatar: "" });
+    setPacienteProfile({
+      name: data.role === "paciente" ? data.userName : data.patientName,
+      avatar: "",
+      dob: data.role === "paciente" ? data.userDob : data.patientDob,
+      height: data.height,
+      weight: data.weight,
+      clinicalCondition: data.clinicalCondition
+    });
 
     // Generate initial meds
     const generatedMeds: Medicine[] = data.meds.map((m, idx) => ({
@@ -400,15 +358,16 @@ export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteView
       initialDone[m.id] = false;
     });
     setMedsDone(initialDone);
+    
+    setHasCompletedRegistration(true);
   };
 
   const handleResetRegistration = () => {
     if (confirm("Deseja apagar o cadastro atual e reiniciar o aplicativo?")) {
-      localStorage.removeItem("registration");
-      setRegistration(null);
+      setHasCompletedRegistration(false);
       setMeds([]);
       setMedsDone({});
-      setProfile({ name: "Paciente", avatar: "" });
+      setPacienteProfile({ name: "Paciente", avatar: "" });
       setActiveTab("inicio");
     }
   };
@@ -420,40 +379,23 @@ export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteView
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
-  if (!isLoaded) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "var(--gray-50)" }}>
-        <div style={{ fontSize: "14px", fontWeight: "bold", color: "var(--blue)" }}>Carregando dados...</div>
-      </div>
-    );
-  }
-
-  const nameToDisplay = registration 
-    ? (registration.role === "cuidador" ? registration.userName : registration.patientName)
-    : profile.name;
+  const nameToDisplay = pacienteProfile.name || "Paciente";
 
   return (
     <div className="view active">
       <div className="hero-strip">
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
-          <div className="avatar" style={{ background: "rgba(255,255,255,0.2)", color: "white", width: "48px", height: "48px", fontSize: profile.avatar ? "28px" : "18px" }}>
-            {profile.avatar || getInitials(nameToDisplay)}
+          <div className="avatar" style={{ background: "rgba(255,255,255,0.2)", color: "white", width: "48px", height: "48px", fontSize: pacienteProfile.avatar ? "28px" : "18px" }}>
+            {pacienteProfile.avatar || getInitials(nameToDisplay)}
           </div>
           <div className="hero-title" style={{ margin: 0 }}>
             Olá, <span>{nameToDisplay}</span>
           </div>
         </div>
         <div className="hero-sub">
-          {registration && registration.role === "cuidador" 
-            ? `Você está visualizando e administrando o cuidado de ${registration.patientName}.`
-            : "Bem-vinda ao Conecta Farma. Aqui você não está sozinha no seu tratamento — acompanhamos você todos os dias."}
+          Bem-vinda ao Conecta Farma. Aqui você não está sozinha no seu tratamento — acompanhamos você todos os dias.
         </div>
         <div className="hero-tags">
-          {registration && registration.role === "cuidador" && (
-            <div className="hero-tag" style={{ background: "var(--yellow)", color: "#0f172a" }}>
-              🧑‍🤝‍🧑 Cuidando de: {registration.patientName}
-            </div>
-          )}
           <div className="hero-tag">💊 CEAF Ativo</div>
           <div className="hero-tag">🟢 {meds.length} medicamentos</div>
         </div>
@@ -478,7 +420,7 @@ export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteView
               >
                 ♿ Modo Acessibilidade
               </button>
-              {registration && (
+              {hasCompletedRegistration && (
                 <button
                   className="btn btn-sm"
                   onClick={handleResetRegistration}
@@ -496,11 +438,10 @@ export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteView
             </div>
             
             <div className="phone-screen">
-              {registration === null ? (
+              {!hasCompletedRegistration ? (
                 <CadastroScreen onComplete={handleCadastroComplete} />
               ) : (
                 <>
-                  {/* Header */}
                   <div className="screen-header">
                     <div className="screen-status">
                       <span>09:41</span>
@@ -519,7 +460,7 @@ export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteView
                       </div>
                     </div>
                     <div className="screen-title">
-                      {registration.role === "cuidador" ? `Cuidado de ${registration.patientName}` : "Minha Farmacoterapia"}
+                      {pacienteProfile.name ? `Minha Farmacoterapia (${pacienteProfile.name})` : "Minha Farmacoterapia"}
                     </div>
                     <div className="screen-subtitle">Hoje, Domingo · 26 abr 2026</div>
                   </div>
@@ -527,37 +468,11 @@ export default function PacienteView({ isDarkMode, setIsDarkMode }: PacienteView
                   {/* Body */}
                   <div className="screen-body">
                     <div key={activeTab} className="tab-content">
-                      {activeTab === "inicio" && (
-                        <InicioTab 
-                          meds={meds} 
-                          medsDone={medsDone} 
-                          setMedsDone={setMedsDone} 
-                          onNavigate={(tab) => setActiveTab(tab)} 
-                          registration={registration} 
-                        />
-                      )}
-                      {activeTab === "meds" && (
-                        <MedsTab 
-                          meds={meds} 
-                          setMeds={setMeds} 
-                          registration={registration} 
-                        />
-                      )}
+                      {activeTab === "inicio" && <InicioTab onNavigate={(tab) => setActiveTab(tab)} />}
+                      {activeTab === "meds" && <MedsTab />}
                       {activeTab === "guia" && <GuiaTab />}
-                      {activeTab === "chat" && <ChatTab profile={profile} />}
-                      {activeTab === "perfil" && (
-                        <PerfilTab 
-                          profile={profile} 
-                          setProfile={setProfile} 
-                          meds={meds} 
-                          setMeds={setMeds} 
-                          setMedsDone={setMedsDone} 
-                          isDarkMode={isDarkMode} 
-                          setIsDarkMode={setIsDarkMode} 
-                          registration={registration}
-                          onReset={handleResetRegistration}
-                        />
-                      )}
+                      {activeTab === "chat" && <ChatTab />}
+                      {activeTab === "perfil" && <PerfilTab onReset={handleResetRegistration} />}
                     </div>
                   </div>
 

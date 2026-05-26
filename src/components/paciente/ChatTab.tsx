@@ -1,38 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useAppStore, ChatMessage } from "../../store/AppStore";
 
-interface UserProfile {
-  name: string;
-  avatar: string;
-}
-
-interface ChatTabProps {
-  profile?: UserProfile;
-}
-
-interface ChatMessage {
-  id: string;
-  sender: "bot" | "user";
-  text: string;
-  timestamp: string;
-  options?: { label: string; value: string }[];
-}
-
-const getInitialMessages = (name: string): ChatMessage[] => [
-  {
-    id: "welcome",
-    sender: "bot",
-    text: `Olá, ${name}! Sou o Assistente Conecta Farma. Como posso te ajudar hoje?\n\nDigite o número correspondente ou clique em uma opção:`,
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    options: [
-      { label: "1. Relatar Sintomas", value: "1" },
-      { label: "2. Dúvidas & Ajuda (Falar com Profissional)", value: "2" },
-      { label: "3. Informações / FAQ", value: "3" }
-    ]
-  }
-];
-
-export default function ChatTab({ profile = { name: "Paciente", avatar: "" } }: ChatTabProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => getInitialMessages(profile.name));
+export default function ChatTab() {
+  const { pacienteProfile: profile, chatMessages: messages, setChatMessages: setMessages } = useAppStore();
+  
   const [conversationState, setConversationState] = useState<"menu" | "sintomas_opcao" | "sintomas_detalhes" | "suporte_opcao" | "faq_opcao">("menu");
   const [selectedSymptom, setSelectedSymptom] = useState("");
   const [inputText, setInputText] = useState("");
@@ -416,7 +387,17 @@ export default function ChatTab({ profile = { name: "Paciente", avatar: "" } }: 
         <button
           onClick={() => {
             if (confirm("Deseja reiniciar a conversa?")) {
-              setMessages(getInitialMessages(profile.name));
+              setMessages([{
+                id: "welcome",
+                sender: "bot",
+                text: `Olá! Sou o Assistente Conecta Farma. Como posso te ajudar hoje?\n\nDigite o número correspondente ou clique em uma opção:`,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                options: [
+                  { label: "1. Relatar Sintomas", value: "1" },
+                  { label: "2. Dúvidas & Ajuda (Falar com Profissional)", value: "2" },
+                  { label: "3. Informações / FAQ", value: "3" }
+                ]
+              }]);
               setConversationState("menu");
             }
           }}
